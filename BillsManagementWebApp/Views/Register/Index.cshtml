@@ -1,0 +1,86 @@
+﻿@using BillsManagementWebApp.ViewModels
+@model UserViewModel
+@{
+    ViewBag.Title = "Rejestracja";
+    Layout = Constants.LoginLayoutPath;
+}
+
+<style>
+    .row:not(:last-of-type) {
+        padding-bottom: 10px;
+    }
+
+    .col-md-3 {
+        padding-top: 4px;
+    }
+</style>
+
+<div style="margin: 0 auto; margin-top: 100px; width: 664px; background-color: rgba(180, 180, 180, 0.25); padding: 0 10px 10px 10px; border-radius: 5px; border: 1px solid #BBB;">
+    @using (Html.BeginForm("Register", "Register", FormMethod.Post))
+    {
+    <div class="row">
+        <div class="col-md-12">
+            <h3 style="line-height: 10px; margin-top: 13px; font-family: Lato;"><i class="glyphicon glyphicon-globe" style="font-size: 18px;"></i>&nbsp;Rejestracja</h3>
+            <hr style="margin: 15px 0px 0px 0px; border-color: #BBB;" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <label>
+                Imię:
+            </label>
+        </div>
+        <div class="col-md-9">
+            @Html.TextBoxFor(x => x.FirstName, new { @class = "form-control" })
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <label>
+                Nazwisko:
+            </label>
+        </div>
+        <div class="col-md-9">
+            @Html.TextBoxFor(x => x.LastName, new { @class = "form-control" })
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <label>
+                Nazwa użytkownika:
+            </label>
+        </div>
+        <div class="col-md-9">
+            @Html.TextBoxFor(x => x.Username, new { @class = "form-control" })
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <label>
+                Hasło:
+            </label>
+        </div>
+        <div class="col-md-9">
+            @Html.TextBoxFor(x => x.Password, new { @class = "form-control", @type = "password" })
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <label>
+                E-mail:
+            </label>
+        </div>
+        <div class="col-md-9">
+            @Html.TextBoxFor(x => x.Email, new { @class = "form-control" })
+        </div>
+    </div>   
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-9">
+            <button class="btn btn-primary btn-md" style="width: 100%; background-color: #999; border: 1px solid #888; height: 37px; font-weight: bold;">
+                <i class="glyphicon glyphicon-pencil"></i>&nbsp;Rejestruj
+            </button>
+        </div>
+    </div>
+    }
+</div>

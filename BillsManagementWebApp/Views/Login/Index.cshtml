@@ -1,0 +1,43 @@
+﻿@{
+    ViewBag.Title = "Logowanie";
+    Layout = Constants.LoginLayoutPath;
+}     
+
+<div style="margin: 0 auto; margin-top: 200px; width: 400px; background-color: rgba(180, 180, 180, 0.25); padding: 0px 10px 10px 10px; border-radius: 5px; border: 1px solid #BBB;">
+    <div class="row" style="padding-bottom: 10px;">
+        <div class="col-md-12">
+            <h3 style="line-height: 10px; margin-top: 13px; font-family: Lato;"><i class="glyphicon glyphicon-globe" style="font-size: 18px;"></i>&nbsp;Logowanie</h3>
+            <hr style="margin: 15px 0px 0px 0px; border-color: #BBB;" />
+        </div>
+    </div>
+    <div class="row" style="padding-bottom: 10px;">
+        <div class="col-md-12">
+            <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                <input type="text" class="form-control" placeholder="Nazwa użytkownika" style="height: 46px; font-size: 16px;" />
+            </div>
+        </div>
+    </div>
+    <div class="row" style="padding-bottom: 10px;">
+        <div class="col-md-12">
+            <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+                <input type="password" class="form-control" placeholder="Hasło" style="height: 46px; font-size: 16px;" />
+            </div>
+        </div>
+    </div>
+    <div class="row" style="padding-bottom: 10px;">
+        <div class="col-md-12">
+            <button class="btn btn-primary btn-md" style="width: 100%; background-color: #999; border: 1px solid #888; height: 37px; font-weight: bold;">
+                <i class="glyphicon glyphicon-log-in"></i>&nbsp;Zaloguj
+            </button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <a href="/Register" class="btn btn-primary btn-md" style="width: 100%; background-color: #999; border: 1px solid #888; height: 37px; font-weight: bold;">
+                <i class="glyphicon glyphicon-pencil"></i>&nbsp;Rejestracja
+            </a>
+        </div>
+    </div>
+</div>
