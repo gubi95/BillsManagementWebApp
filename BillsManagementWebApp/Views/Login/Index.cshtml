@@ -1,4 +1,6 @@
-﻿@{
+﻿@using BillsManagementWebApp.ViewModels
+@model LoginViewModel
+@{
     ViewBag.Title = "Logowanie";
     Layout = Constants.LoginLayoutPath;
 }     
@@ -15,6 +17,7 @@
             <div class="input-group">
                 <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
                 <input type="text" class="form-control" placeholder="Nazwa użytkownika" style="height: 46px; font-size: 16px;" />
+                
             </div>
         </div>
     </div>
@@ -41,3 +44,24 @@
         </div>
     </div>
 </div>
+
+<script>
+    jQuery(document).ready(function () {
+        jQuery.ajax({
+            type: 'POST',
+            url: '/api/User/login',
+            data: JSON.stringify({
+                Username: 'r.gubala',
+                Password: '1234567'
+            }),
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (data) {
+                console.log(data);
+            },
+            error: function (e) {
+                console.log('error: ' + e);
+            }
+        });
+    });
+</script>

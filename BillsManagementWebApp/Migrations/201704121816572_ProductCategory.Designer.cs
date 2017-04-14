@@ -7,13 +7,13 @@ namespace BillsManagementWebApp.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class UserModelRequired : IMigrationMetadata
+    public sealed partial class ProductCategory : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(UserModelRequired));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(ProductCategory));
         
         string IMigrationMetadata.Id
         {
-            get { return "201704091511047_UserModelRequired"; }
+            get { return "201704121816572_ProductCategory"; }
         }
         
         string IMigrationMetadata.Source
