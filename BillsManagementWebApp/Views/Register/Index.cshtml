@@ -15,8 +15,15 @@
     }
 </style>
 
+<script>
+    var formValidator = null;
+    jQuery(document).ready(function () {
+        formValidator = new Validator('#formRegister');
+    });
+</script>
+
 <div style="margin: 0 auto; margin-top: 100px; width: 664px; background-color: rgba(180, 180, 180, 0.25); padding: 0 10px 10px 10px; border-radius: 5px; border: 1px solid #BBB;">
-    @using (Html.BeginForm("Register", "Register", FormMethod.Post))
+    @using (Html.BeginForm("Register", "Register", FormMethod.Post, new { @id = "formRegister" }))
     {
     <div class="row">
         <div class="col-md-12">
@@ -31,7 +38,7 @@
             </label>
         </div>
         <div class="col-md-9">
-            @Html.TextBoxFor(x => x.FirstName, new { @class = "form-control" })
+            @Html.TextBoxFor(x => x.FirstName, new { @class = "form-control", @data_validators = "not-empty" })
         </div>
     </div>
     <div class="row">
@@ -41,7 +48,7 @@
             </label>
         </div>
         <div class="col-md-9">
-            @Html.TextBoxFor(x => x.LastName, new { @class = "form-control" })
+            @Html.TextBoxFor(x => x.LastName, new { @class = "form-control", @data_validators = "not-empty" })
         </div>
     </div>
     <div class="row">
@@ -51,7 +58,7 @@
             </label>
         </div>
         <div class="col-md-9">
-            @Html.TextBoxFor(x => x.Username, new { @class = "form-control" })
+            @Html.TextBoxFor(x => x.Username, new { @class = "form-control", @data_validators = "not-empty" })
         </div>
     </div>
     <div class="row">
@@ -61,7 +68,7 @@
             </label>
         </div>
         <div class="col-md-9">
-            @Html.TextBoxFor(x => x.Password, new { @class = "form-control", @type = "password" })
+            @Html.TextBoxFor(x => x.Password, new { @class = "form-control", @type = "password", @data_validators = "not-empty" })
         </div>
     </div>
     <div class="row">
@@ -71,13 +78,13 @@
             </label>
         </div>
         <div class="col-md-9">
-            @Html.TextBoxFor(x => x.Email, new { @class = "form-control" })
+            @Html.TextBoxFor(x => x.Email, new { @class = "form-control", @data_validators = "not-empty" })
         </div>
     </div>   
     <div class="row">
         <div class="col-md-3"></div>
         <div class="col-md-9">
-            <button class="btn btn-primary btn-md" style="width: 100%; background-color: #999; border: 1px solid #888; height: 37px; font-weight: bold;">
+            <button class="btn btn-primary btn-md" style="width: 100%; background-color: #999; border: 1px solid #888; height: 37px; font-weight: bold;" onclick="return formValidator.validate();">
                 <i class="glyphicon glyphicon-pencil"></i>&nbsp;Rejestruj
             </button>
         </div>

@@ -250,6 +250,7 @@
     <Content Include="Assets\js\bootstrap-3.3.7-dist\js\bootstrap.min.js" />
     <Content Include="Assets\js\bootstrap-3.3.7-dist\js\npm.js" />
     <Content Include="Assets\js\jQuery-3-2-0\jQuery-3-2-0.js" />
+    <Content Include="Assets\js\js-custom-validation-lib\js-custom-validation-lib.js" />
     <Content Include="Content\Site.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
