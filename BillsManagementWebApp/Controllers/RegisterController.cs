@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using BillsManagementWebApp.Shared;
 using BillsManagementWebApp.ViewModels;
+using BillsManagementWebApp.Models;
 
 namespace BillsManagementWebApp.Controllers
 {
@@ -18,9 +19,16 @@ namespace BillsManagementWebApp.Controllers
         [HttpPost]
         public ActionResult Register(UserViewModel objUserViewModel)
         {
-            // TODO: password hashing 
-            //string strHashedPassword = PasswordHasher.
-            return null;
+            ApplicationDBContext objApplicationDBContext = new ApplicationDBContext();
+            Models.User objUser = new Models.User();                                  
+            objUserViewModel.ApplyToModel(ref objUser);
+            objUser.Password = PasswordHasher.GenerateHashForUser(objUserViewModel.Password);
+            objApplicationDBContext.Users.Add(objUser);
+            objApplicationDBContext.SaveChanges();
+
+            SessionManager.SetCurrentUser(objUser);
+                                         
+            return RedirectToAction("Index", "Home");
         }
     }
 }

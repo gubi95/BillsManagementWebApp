@@ -6,6 +6,8 @@
 }     
 
 <div style="margin: 0 auto; margin-top: 200px; width: 400px; background-color: rgba(180, 180, 180, 0.25); padding: 0px 10px 10px 10px; border-radius: 5px; border: 1px solid #BBB;">
+    @using (Html.BeginForm("SignIn", "Login", FormMethod.Post))
+    {
     <div class="row" style="padding-bottom: 10px;">
         <div class="col-md-12">
             <h3 style="line-height: 10px; margin-top: 13px; font-family: Lato;"><i class="glyphicon glyphicon-globe" style="font-size: 18px;"></i>&nbsp;Logowanie</h3>
@@ -16,8 +18,8 @@
         <div class="col-md-12">
             <div class="input-group">
                 <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                <input type="text" class="form-control" placeholder="Nazwa użytkownika" style="height: 46px; font-size: 16px;" />
-                
+                @Html.TextBoxFor(x => x.Username, new { @class = "form-control", @placeholder = "Nazwa użytkownika", @style = "height: 46px; font-size: 16px;" })
+
             </div>
         </div>
     </div>
@@ -25,7 +27,7 @@
         <div class="col-md-12">
             <div class="input-group">
                 <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                <input type="password" class="form-control" placeholder="Hasło" style="height: 46px; font-size: 16px;" />
+                @Html.TextBoxFor(x => x.Password, new { @type = "password", @class = "form-control", @placeholder = "Hasło", @style = "height: 46px; font-size: 16px;"  })
             </div>
         </div>
     </div>
@@ -43,6 +45,7 @@
             </a>
         </div>
     </div>
+    }
 </div>
 
 <script>

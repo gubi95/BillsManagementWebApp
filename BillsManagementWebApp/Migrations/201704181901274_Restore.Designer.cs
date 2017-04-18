@@ -7,13 +7,13 @@ namespace BillsManagementWebApp.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class ProductCategory : IMigrationMetadata
+    public sealed partial class Restore : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(ProductCategory));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Restore));
         
         string IMigrationMetadata.Id
         {
-            get { return "201704121816572_ProductCategory"; }
+            get { return "201704181901274_Restore"; }
         }
         
         string IMigrationMetadata.Source
