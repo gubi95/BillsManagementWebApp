@@ -3,10 +3,17 @@
 @{
     ViewBag.Title = "Logowanie";
     Layout = Constants.LoginLayoutPath;
-}     
+}  
+
+<script>
+    var formValidator = null;
+    jQuery(document).ready(function () {
+        formValidator = new Validator('#formLogIn');
+    });
+</script>   
 
 <div style="margin: 0 auto; margin-top: 200px; width: 400px; background-color: rgba(180, 180, 180, 0.25); padding: 0px 10px 10px 10px; border-radius: 5px; border: 1px solid #BBB;">
-    @using (Html.BeginForm("SignIn", "Login", FormMethod.Post))
+    @using (Html.BeginForm("SignIn", "Login", FormMethod.Post, new { @id = "formLogIn" }))
     {
     <div class="row" style="padding-bottom: 10px;">
         <div class="col-md-12">
@@ -18,7 +25,7 @@
         <div class="col-md-12">
             <div class="input-group">
                 <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                @Html.TextBoxFor(x => x.Username, new { @class = "form-control", @placeholder = "Nazwa użytkownika", @style = "height: 46px; font-size: 16px;" })
+                @Html.TextBoxFor(x => x.Username, new { @class = "form-control", @placeholder = "Nazwa użytkownika", @style = "height: 46px; font-size: 16px;", @data_validators = "not-empty" })
 
             </div>
         </div>
@@ -27,13 +34,13 @@
         <div class="col-md-12">
             <div class="input-group">
                 <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                @Html.TextBoxFor(x => x.Password, new { @type = "password", @class = "form-control", @placeholder = "Hasło", @style = "height: 46px; font-size: 16px;"  })
+                @Html.TextBoxFor(x => x.Password, new { @type = "password", @class = "form-control", @placeholder = "Hasło", @style = "height: 46px; font-size: 16px;", @data_validators = "not-empty" })
             </div>
         </div>
     </div>
     <div class="row" style="padding-bottom: 10px;">
         <div class="col-md-12">
-            <button class="btn btn-primary btn-md" style="width: 100%; background-color: #999; border: 1px solid #888; height: 37px; font-weight: bold;">
+            <button class="btn btn-primary btn-md" style="width: 100%; background-color: #999; border: 1px solid #888; height: 37px; font-weight: bold;" onclick="return formValidator.validate();">
                 <i class="glyphicon glyphicon-log-in"></i>&nbsp;Zaloguj
             </button>
         </div>
@@ -48,7 +55,9 @@
     }
 </div>
 
-<script>
+@*
+    // test api code
+    <script>
     jQuery(document).ready(function () {
         jQuery.ajax({
             type: 'POST',
@@ -67,4 +76,4 @@
             }
         });
     });
-</script>
+</script>*@

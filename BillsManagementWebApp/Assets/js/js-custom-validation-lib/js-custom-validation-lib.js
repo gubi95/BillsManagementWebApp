@@ -34,8 +34,8 @@ function ValidateContainer(container) {
 
                 if (validationTags[k] == validators[j]) {
                     if (checkValidationFunctions[validationFunctionsNames[k]](container.fields[i]) == false) {
-                        container.fields[i].parent().find('.val-err-msg').remove();
-                        container.fields[i].parent().append('<span class="val-err-msg" style="color: #54001B; font-family: Lato; font-size: 12px;">' + valdiationErrorMessages[k] + '</span>');
+                        container.fields[i].closest('div[class*="col-md"]').find('.val-err-msg').remove();
+                        container.fields[i].closest('div[class*="col-md"]').append('<span class="val-err-msg" style="color: #54001B; font-family: Lato; font-size: 12px;">' + valdiationErrorMessages[k] + '</span>');
 
                         //if (container.fields[i].is('input:text') || container.fields[i].is('input:password')) {
                         //    container.fields[i].css('box-shadow', 'inset 0 1px 1px rgba(255,0,0,.075)', 'important');
