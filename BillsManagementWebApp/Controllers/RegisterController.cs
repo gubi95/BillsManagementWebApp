@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using BillsManagementWebApp.Shared;
 using BillsManagementWebApp.ViewModels;
 
 namespace BillsManagementWebApp.Controllers
@@ -17,6 +18,8 @@ namespace BillsManagementWebApp.Controllers
         [HttpPost]
         public ActionResult Register(UserViewModel objUserViewModel)
         {
+            // TODO: password hashing 
+            //string strHashedPassword = PasswordHasher.
             return null;
         }
     }

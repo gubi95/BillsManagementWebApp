@@ -30,5 +30,7 @@ namespace BillsManagementWebApp.Models
         [Required]
         [MaxLength(150)]
         public string LastName { get; set; }
+
+        public List<Bill> Bills { get; set; }
     }
 }

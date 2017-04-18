@@ -13,5 +13,11 @@ namespace BillsManagementWebApp.Models
         }
 
         public DbSet<User> Users { get; set; }
+
+        public DbSet<Bill> Bills { get; set; }
+
+        public DbSet<BillEntry> BillEntries { get; set; }
+
+        public DbSet<ProductCategory> ProductCategories { get; set; }
     }
 }
