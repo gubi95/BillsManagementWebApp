@@ -10,6 +10,39 @@ namespace BillsManagementWebApp.WebAPI
 {
     public class ProductCategoryController : ApiController
     {
+        public class ProductcategoryReturnEntityWrapper
+        {
+            public enum EnumReturnCodes
+            {
+                OK = 0                
+            }
+
+            private EnumReturnCodes enumReturnCode = EnumReturnCodes.OK;
+
+            public List<ProductCategoryApiWrapper> Categories { get; set; }
+
+            public ProductcategoryReturnEntityWrapper(EnumReturnCodes enumRetCode)
+            {
+                this.enumReturnCode = enumRetCode;
+            }
+
+            public int ReturnCode
+            {
+                get
+                {
+                    return (int)this.enumReturnCode;
+                }
+            }
+
+            public string ReturnMessage
+            {
+                get
+                {
+                    return this.enumReturnCode.ToString();
+                }
+            }
+        }
+
         public class ProductCategoryApiWrapper
         {
             public int ProductCategoryID { get; set; }
@@ -31,7 +64,7 @@ namespace BillsManagementWebApp.WebAPI
 
         [HttpGet]
         [ActionName("getall")]
-        public List<ProductCategoryApiWrapper> GetAll()
+        public ProductcategoryReturnEntityWrapper GetAll()
         {
             ApplicationDBContext objApplicationDBContext = new ApplicationDBContext();
             List<ProductCategory> listProductCategory = objApplicationDBContext.ProductCategories.ToList();
@@ -43,7 +76,7 @@ namespace BillsManagementWebApp.WebAPI
                 listProductCategoryApiWrapper.Add(new ProductCategoryApiWrapper(objProductCategory));
             }
 
-            return listProductCategoryApiWrapper;
+            return new ProductcategoryReturnEntityWrapper(ProductcategoryReturnEntityWrapper.EnumReturnCodes.OK) { Categories = listProductCategoryApiWrapper };
         }
     }
 }
