@@ -10,6 +10,44 @@ namespace BillsManagementWebApp.WebAPI
 {
     public class BillEntryController : ApiController
     {
+        public class BillEntryReturnEntityWrapper
+        {
+            public enum EnumReturnCodes
+            {
+                OK = 0,
+                WRONG_BILL_ENTRY_ID = 1,
+                WRONG_PRODUCT_NAME = 2,
+                WRONG_PRICE = 3,
+                WRONG_QUANTITY = 4,
+                WRONG_CATEGORY = 5
+            }
+
+            private EnumReturnCodes enumReturnCode = EnumReturnCodes.OK;
+
+            public BillEntryApiWrapper BillEntry { get; set; }
+
+            public BillEntryReturnEntityWrapper(EnumReturnCodes enumRetCode)
+            {
+                this.enumReturnCode = enumRetCode;
+            }
+
+            public int ReturnCode
+            {
+                get
+                {
+                    return (int)this.enumReturnCode;
+                }
+            }
+
+            public string ReturnMessage
+            {
+                get
+                {
+                    return this.enumReturnCode.ToString();
+                }
+            }
+        }
+
         public class BillEntryApiWrapper
         {
             public int BillEntryID { get; set; }
@@ -42,9 +80,13 @@ namespace BillsManagementWebApp.WebAPI
 
         [HttpPost]
         [ActionName("edit")]
-        public void Edit(List<BillEntryApiWrapper> listBillEntryApiWrapper)
+        public BillEntryReturnEntityWrapper Edit(List<BillEntryApiWrapper> listBillEntryApiWrapper)
         {
             ApplicationDBContext objApplicationDBContext = new ApplicationDBContext();
+
+            List<ProductCategory> listProductCategory = objApplicationDBContext
+                .ProductCategories
+                .ToList();
 
             List<int> listIDs = listBillEntryApiWrapper.Select(y => y.BillEntryID).ToList();
 
@@ -54,9 +96,34 @@ namespace BillsManagementWebApp.WebAPI
                 .Where(x => listIDs.Contains(x.BillEntryID))
                 .ToList();
 
-            List<ProductCategory> listProductCategory = objApplicationDBContext
-                .ProductCategories
-                .ToList();
+            if (listBillEntry.Count != listBillEntryApiWrapper.Count)
+            {
+                return new BillEntryReturnEntityWrapper(BillEntryReturnEntityWrapper.EnumReturnCodes.WRONG_BILL_ENTRY_ID);
+            }
+
+            foreach (BillEntryApiWrapper objBillEntryApiWrapper in listBillEntryApiWrapper)
+            {
+                if (("" + objBillEntryApiWrapper.ProductName).Trim() == "")
+                {
+                    return new BillEntryReturnEntityWrapper(BillEntryReturnEntityWrapper.EnumReturnCodes.WRONG_PRODUCT_NAME);
+                }
+
+                if (objBillEntryApiWrapper.Price <= 0.0M)
+                {
+                    return new BillEntryReturnEntityWrapper(BillEntryReturnEntityWrapper.EnumReturnCodes.WRONG_PRICE);
+                }
+
+                if (objBillEntryApiWrapper.Quantity <= 0.0)
+                {
+                    return new BillEntryReturnEntityWrapper(BillEntryReturnEntityWrapper.EnumReturnCodes.WRONG_QUANTITY);
+                }
+
+                if (objBillEntryApiWrapper.Category == null ||
+                    listProductCategory.Find(x => x.ProductCategoryID == objBillEntryApiWrapper.Category.ProductCategoryID) == null)
+                {
+                    return new BillEntryReturnEntityWrapper(BillEntryReturnEntityWrapper.EnumReturnCodes.WRONG_CATEGORY);
+                }
+            }
 
             for (int i = 0; i < listBillEntry.Count; i++)
             {
@@ -67,16 +134,18 @@ namespace BillsManagementWebApp.WebAPI
                     listBillEntry[i].Price = objBillEntryApiWrapper.Price;
                     listBillEntry[i].Quantity = objBillEntryApiWrapper.Quantity;
                     listBillEntry[i].ProductName = objBillEntryApiWrapper.ProductName;
-                    listBillEntry[i].Category = listProductCategory.Find(x => x.ProductCategoryID == objBillEntryApiWrapper.Category.ProductCategoryID);                    
+                    listBillEntry[i].Category = listProductCategory.Find(x => x.ProductCategoryID == objBillEntryApiWrapper.Category.ProductCategoryID);
                 }
             }
 
             objApplicationDBContext.SaveChanges();
+
+            return new BillEntryReturnEntityWrapper(BillEntryReturnEntityWrapper.EnumReturnCodes.OK);
         }
 
         [HttpPost]
         [ActionName("delete")]
-        public void Delete(List<int> IDs)
+        public BillEntryReturnEntityWrapper Delete(List<int> IDs)
         {
             ApplicationDBContext objApplicationDBContext = new ApplicationDBContext();
 
@@ -89,6 +158,8 @@ namespace BillsManagementWebApp.WebAPI
                  );
 
             objApplicationDBContext.SaveChanges();
+
+            return new BillEntryReturnEntityWrapper(BillEntryReturnEntityWrapper.EnumReturnCodes.OK);
         }
     }
 } 
