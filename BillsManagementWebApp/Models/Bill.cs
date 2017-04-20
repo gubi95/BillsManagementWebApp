@@ -17,5 +17,8 @@ namespace BillsManagementWebApp.Models
         public DateTime PurchaseDate { get; set; }
 
         public List<BillEntry> Entries { get; set; }
+
+        [Required]
+        public Shop Shop { get; set; }
     }
 }

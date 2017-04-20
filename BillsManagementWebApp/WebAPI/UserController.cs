@@ -9,6 +9,46 @@ namespace BillsManagementWebApp.WebAPI
 {
     public class UserController : ApiController
     {
+        public class UserReturnEntityWrapper
+        {
+            public enum EnumReturnCodes
+            {
+                OK = 0,
+                WRONG_USER_ID = 1,
+                WRONG_USERNAME_OR_PASSWORD = 2,
+                WRONG_USERNAME = 3,
+                WRONG_PASSWORD = 4,
+                WRONG_EMAIL = 5,
+                WRONG_FIRST_NAME = 6,
+                WRONG_LAST_NAME = 7
+            }
+
+            private EnumReturnCodes enumReturnCode = EnumReturnCodes.OK;
+
+            public UserApiWrapper User { get; set; }
+
+            public UserReturnEntityWrapper(EnumReturnCodes enumRetCode)
+            {
+                this.enumReturnCode = enumRetCode;
+            }
+
+            public int ReturnCode
+            {
+                get
+                {
+                    return (int)this.enumReturnCode;
+                }
+            }
+
+            public string ReturnMessage
+            {
+                get
+                {
+                    return this.enumReturnCode.ToString();
+                }  
+            }
+        }
+
         public class UserApiWrapper
         {
             public int UserID { get; set; }
@@ -53,7 +93,7 @@ namespace BillsManagementWebApp.WebAPI
 
         [HttpPost]
         [ActionName("login")]
-        public UserApiWrapper Login(UserApiWrapper objUserApiWrapper)
+        public UserReturnEntityWrapper Login(UserApiWrapper objUserApiWrapper)
         {
             Models.User objUser = new ApplicationDBContext()
                 .Users
@@ -72,17 +112,48 @@ namespace BillsManagementWebApp.WebAPI
 
                 if (bPasswordMatches)
                 {
-                    return new UserApiWrapper(objUser);
+                    return new UserReturnEntityWrapper(UserReturnEntityWrapper.EnumReturnCodes.OK) { User = new UserApiWrapper(objUser) };
+                }
+                else
+                {
+                    return new UserReturnEntityWrapper(UserReturnEntityWrapper.EnumReturnCodes.WRONG_USERNAME_OR_PASSWORD);
                 }
             }
-
-            return null;
+            else
+            {
+                return new UserReturnEntityWrapper(UserReturnEntityWrapper.EnumReturnCodes.WRONG_USERNAME_OR_PASSWORD);
+            }
         } 
 
         [HttpPost]
         [ActionName("create")]
-        public int Create(UserApiWrapper objUserApiWrapper)
+        public UserReturnEntityWrapper Create(UserApiWrapper objUserApiWrapper)
         {
+            if (("" + objUserApiWrapper.Username).Trim() == "")
+            {
+                return new UserReturnEntityWrapper(UserReturnEntityWrapper.EnumReturnCodes.WRONG_USERNAME);
+            }
+
+            if (("" + objUserApiWrapper.Password).Trim() == "")
+            {
+                return new UserReturnEntityWrapper(UserReturnEntityWrapper.EnumReturnCodes.WRONG_PASSWORD);
+            }
+
+            if (("" + objUserApiWrapper.FirstName).Trim() == "")
+            {
+                return new UserReturnEntityWrapper(UserReturnEntityWrapper.EnumReturnCodes.WRONG_FIRST_NAME);
+            }
+
+            if (("" + objUserApiWrapper.LastName).Trim() == "")
+            {
+                return new UserReturnEntityWrapper(UserReturnEntityWrapper.EnumReturnCodes.WRONG_LAST_NAME);
+            }
+
+            if (("" + objUserApiWrapper.Email).Trim() == "")
+            {
+                return new UserReturnEntityWrapper(UserReturnEntityWrapper.EnumReturnCodes.WRONG_EMAIL);
+            }
+
             ApplicationDBContext objApplicationDBContext = new ApplicationDBContext();
             Models.User objUser = new Models.User()
             {
@@ -90,19 +161,45 @@ namespace BillsManagementWebApp.WebAPI
                 FirstName = objUserApiWrapper.FirstName,
                 LastName = objUserApiWrapper.LastName,
                 Password = BillsManagementWebApp.Shared.PasswordHasher.GenerateHashForUser(objUserApiWrapper.Password),
-                Username = objUserApiWrapper.Username
+                Username = objUserApiWrapper.Username,
+                Bills = new List<Bill>()
             };
 
             objApplicationDBContext.Users.Add(objUser);
             objApplicationDBContext.SaveChanges();
 
-            return objUser.UserID;
+            return new UserReturnEntityWrapper(UserReturnEntityWrapper.EnumReturnCodes.OK) { User = new UserApiWrapper(objUser) };
         }
 
         [HttpPost]
         [ActionName("edit")]
-        public void Edit(UserApiWrapper objUserApiWrapper)
+        public UserReturnEntityWrapper Edit(UserApiWrapper objUserApiWrapper)
         {
+            if (("" + objUserApiWrapper.Username).Trim() == "")
+            {
+                return new UserReturnEntityWrapper(UserReturnEntityWrapper.EnumReturnCodes.WRONG_USERNAME);
+            }
+
+            if (("" + objUserApiWrapper.Password).Trim() == "")
+            {
+                return new UserReturnEntityWrapper(UserReturnEntityWrapper.EnumReturnCodes.WRONG_PASSWORD);
+            }
+
+            if (("" + objUserApiWrapper.FirstName).Trim() == "")
+            {
+                return new UserReturnEntityWrapper(UserReturnEntityWrapper.EnumReturnCodes.WRONG_FIRST_NAME);
+            }
+
+            if (("" + objUserApiWrapper.LastName).Trim() == "")
+            {
+                return new UserReturnEntityWrapper(UserReturnEntityWrapper.EnumReturnCodes.WRONG_LAST_NAME);
+            }
+
+            if (("" + objUserApiWrapper.Email).Trim() == "")
+            {
+                return new UserReturnEntityWrapper(UserReturnEntityWrapper.EnumReturnCodes.WRONG_EMAIL);
+            }
+
             ApplicationDBContext objApplicationDBContext = new ApplicationDBContext();
 
             Models.User objUser = objApplicationDBContext.Users.Where(x => x.UserID == objUserApiWrapper.UserID).FirstOrDefault();
@@ -111,6 +208,11 @@ namespace BillsManagementWebApp.WebAPI
             {
                 objUserApiWrapper.FillModel(ref objUser);
                 objApplicationDBContext.SaveChanges();
+                return new UserReturnEntityWrapper(UserReturnEntityWrapper.EnumReturnCodes.OK);
+            }
+            else
+            {
+                return new UserReturnEntityWrapper(UserReturnEntityWrapper.EnumReturnCodes.WRONG_USER_ID);
             }
         }
     }
