@@ -214,6 +214,10 @@
     <Compile Include="Migrations\201704201936256_ShopModel.Designer.cs">
       <DependentUpon>201704201936256_ShopModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201704231521499_Shop.cs" />
+    <Compile Include="Migrations\201704231521499_Shop.Designer.cs">
+      <DependentUpon>201704231521499_Shop.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Shop.cs" />
     <Compile Include="Shared\LoggedInUserAttribute.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -238,6 +242,7 @@
     <Compile Include="WebAPI\BillController.cs" />
     <Compile Include="WebAPI\BillEntryController.cs" />
     <Compile Include="WebAPI\ProductCategoryController.cs" />
+    <Compile Include="WebAPI\ShopController.cs" />
     <Compile Include="WebAPI\UserController.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -293,6 +298,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201704201936256_ShopModel.resx">
       <DependentUpon>201704201936256_ShopModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201704231521499_Shop.resx">
+      <DependentUpon>201704231521499_Shop.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

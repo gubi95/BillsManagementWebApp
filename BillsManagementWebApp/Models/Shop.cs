@@ -14,5 +14,8 @@ namespace BillsManagementWebApp.Models
         [Required]
         [MaxLength(100)]
         public string ShopName { get; set; }
+
+        [Required]
+        public User UserOwner { get; set; }
     }
 }

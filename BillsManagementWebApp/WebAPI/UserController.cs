@@ -98,6 +98,8 @@ namespace BillsManagementWebApp.WebAPI
             Models.User objUser = new ApplicationDBContext()
                 .Users
                 .Include("Bills")
+                .Include("Bills.Shop")
+                .Include("Bills.Shop.UserOwner")
                 .Include("Bills.Entries")
                 .Include("Bills.Entries.Category")
                 .Where(x => x.Username == objUserApiWrapper.Username)

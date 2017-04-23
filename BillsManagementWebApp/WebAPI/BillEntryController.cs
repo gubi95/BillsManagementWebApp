@@ -19,7 +19,8 @@ namespace BillsManagementWebApp.WebAPI
                 WRONG_PRODUCT_NAME = 2,
                 WRONG_PRICE = 3,
                 WRONG_QUANTITY = 4,
-                WRONG_CATEGORY = 5
+                WRONG_CATEGORY = 5,
+                WRONG_BILL_ID = 6
             }
 
             private EnumReturnCodes enumReturnCode = EnumReturnCodes.OK;
@@ -50,6 +51,9 @@ namespace BillsManagementWebApp.WebAPI
 
         public class BillEntryApiWrapper
         {
+            // additional
+            public int BillID { get; set; }
+
             public int BillEntryID { get; set; }
             public string ProductName { get; set; }
             public decimal Price { get; set; }
@@ -76,6 +80,67 @@ namespace BillsManagementWebApp.WebAPI
                 this.Category.FillModel(ref objProductCategory);
                 objBillEntry.Category = objProductCategory;
             }
+        }
+
+        [HttpPost]
+        [ActionName("create")]
+        public BillEntryReturnEntityWrapper Create(List<BillEntryApiWrapper> listBillEntryApiWrapper)
+        {
+            ApplicationDBContext objApplicationDBContext = new ApplicationDBContext();
+
+            List<ProductCategory> listProductCategory = objApplicationDBContext
+                .ProductCategories
+                .ToList();
+
+            List<Bill> listBill = objApplicationDBContext
+                                    .Bills
+                                    .Include("Entries")
+                                    .ToList();            
+
+            foreach (BillEntryApiWrapper objBillEntryApiWrapper in listBillEntryApiWrapper)
+            {
+                if (("" + objBillEntryApiWrapper.ProductName).Trim() == "")
+                {
+                    return new BillEntryReturnEntityWrapper(BillEntryReturnEntityWrapper.EnumReturnCodes.WRONG_PRODUCT_NAME);
+                }
+
+                if (objBillEntryApiWrapper.Price <= 0.0M)
+                {
+                    return new BillEntryReturnEntityWrapper(BillEntryReturnEntityWrapper.EnumReturnCodes.WRONG_PRICE);
+                }
+
+                if (objBillEntryApiWrapper.Quantity <= 0.0)
+                {
+                    return new BillEntryReturnEntityWrapper(BillEntryReturnEntityWrapper.EnumReturnCodes.WRONG_QUANTITY);
+                }
+
+                if (objBillEntryApiWrapper.Category == null ||
+                    listProductCategory.Find(x => x.ProductCategoryID == objBillEntryApiWrapper.Category.ProductCategoryID) == null)
+                {
+                    return new BillEntryReturnEntityWrapper(BillEntryReturnEntityWrapper.EnumReturnCodes.WRONG_CATEGORY);
+                }
+
+                if (listBill.Find(x => x.BillID == objBillEntryApiWrapper.BillID) == null)
+                {
+                    return new BillEntryReturnEntityWrapper(BillEntryReturnEntityWrapper.EnumReturnCodes.WRONG_BILL_ID);
+                }
+            }
+
+            foreach (BillEntryApiWrapper objBillEntryApiWrapper in listBillEntryApiWrapper)
+            {
+                Bill objBill = listBill.Find(x => x.BillID == objBillEntryApiWrapper.BillID);
+
+                objBill.Entries.Add(new BillEntry()
+                {                       
+                    Category = listProductCategory.Find(x => x.ProductCategoryID == objBillEntryApiWrapper.Category.ProductCategoryID),
+                    Price = objBillEntryApiWrapper.Price,
+                    ProductName = ("" + objBillEntryApiWrapper.ProductName).Trim(),
+                    Quantity = objBillEntryApiWrapper.Quantity
+                });
+            }                                     
+            
+            objApplicationDBContext.SaveChanges();
+            return new BillEntryReturnEntityWrapper(BillEntryReturnEntityWrapper.EnumReturnCodes.OK);
         }
 
         [HttpPost]
