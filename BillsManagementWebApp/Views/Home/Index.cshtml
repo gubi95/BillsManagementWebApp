@@ -1,7 +1,118 @@
-﻿
-@{
-    ViewBag.Title = "Index";
-}
+﻿@{
+    ViewBag.Title = "Strona główna";
+    Layout = Constants.BaseLayoutPath;
+}        
 
-<h2>Index</h2>
+<style>
+    .tile {        
+        background-color: white;        
+        background-color: rgba(25,25,25,0.20);
+        border: 1px solid rgba(25,25,25,0.10);        
+        -webkit-transition: all 0.20s;
+        transition: all 0.20s;
+        cursor: pointer;
+        vertical-align: top; 
+        margin-bottom: 10px;             
+    }
+
+    .tile:hover {
+        background-color: rgba(25,25,25,0.40);
+        -moz-transform: translate(-2px, -2px);
+        -ms-transform: translate(-2px, -2px);
+        -o-transform: translate(-2px, -2px);
+        -webkit-transform: translate(-2px, -2px);
+        transform: translate(-2px, -2px)
+    }
+
+    .tile2x1 {
+        width: 220px;
+        height: 120px;                
+    }
+
+    .tile-header {
+        color: white;
+        font-family: 'Poiret One';        
+        font-size: 38px;
+        position: absolute;
+        left: 12px;
+        top: 4px;
+    }
+
+    .tile-icon {
+        position: absolute;
+        right: 14px;
+        bottom: 14px;
+        font-size: 44px;
+        color: #d6d6d6;
+    }
+
+    .tile-content {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+
+    .grid {
+        position: relative;
+        width: 100%;
+        height: 100%;        
+    }
+
+    .tile-wrapper {
+        width: 230px;
+        height: auto;
+        padding-right: 10px;        
+        border-right: 1px solid rgba(25,25,25,0.25);
+    }
+</style>
+
+<div class="grid">
+    <div class="tile-wrapper">
+        <div class="tile tile2x1">
+            <div class="tile-content">
+                <span class="tile-header">
+                    Paragony
+                </span>
+                <i class="tile-icon fa fa-usd"></i>
+            </div>
+        </div>
+
+        <div class="tile tile2x1">
+            <div class="tile-content">
+                <span class="tile-header" style="font-size: 34px;">
+                    Nowy paragon
+                </span>
+                <i class="tile-icon fa fa-plus"></i>
+            </div>
+        </div>
+
+        <div class="tile tile2x1">
+            <div class="tile-content">
+                <span class="tile-header">
+                    Wydatki
+                </span>
+                <i class="tile-icon fa fa-pie-chart"></i>
+            </div>
+        </div>
+
+        <div class="tile tile2x1">
+            <div class="tile-content">
+                <span class="tile-header" style="font-size: 34px;">
+                    Lista zakupowa
+                </span>
+                <i class="tile-icon glyphicon glyphicon-list-alt" style="top: 60px;"></i>
+            </div>
+        </div>
+
+        <div class="tile tile2x1">
+            <div class="tile-content">
+                <span class="tile-header" style="font-size: 34px;">
+                    Wyloguj
+                </span>
+                <i class="tile-icon glyphicon glyphicon-off" style="top: 60px;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
 
