@@ -55,17 +55,20 @@
     }
 </div>
 
-@*
-    // test api code
+
+    
     <script>
+        // test api code
     jQuery(document).ready(function () {
         jQuery.ajax({
             type: 'POST',
-            url: '/api/User/login',
-            data: JSON.stringify({
-                Username: 'r.gubala',
-                Password: '1234567'
-            }),
+            url: '/api/user/login',
+            data: JSON.stringify(
+                {
+                    Username: 'r.gubala',
+                    Password: '1234567'
+                }
+            ),
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             success: function (data) {
@@ -74,6 +77,6 @@
             error: function (e) {
                 console.log('error: ' + e);
             }
-        });
+        });        
     });
-</script>*@
+</script>
