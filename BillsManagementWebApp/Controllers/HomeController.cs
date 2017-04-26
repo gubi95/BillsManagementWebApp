@@ -3,21 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using BillsManagementWebApp.ViewModels;
 using BillsManagementWebApp.Shared;
 
 namespace BillsManagementWebApp.Controllers
 {
     public class HomeController : Controller
     {
-        [LoggedInUser]
+        [OnlyLoggedInUser]
+        [HttpGet]
         public ActionResult Index()
         {
-            if (SessionManager.GetCurrentUser() == null)
-            {
-                return RedirectToAction("Index", "Login");
-            }
+            UserViewModel objUserViewModel = new UserViewModel();
+            objUserViewModel.ApplyFromModel(SessionManager.GetCurrentUser());
+            return View(objUserViewModel);
+        }
 
-            return View();
+        [HttpPost]
+        public ActionResult SignOut()
+        {
+            SessionManager.SetCurrentUser(null);
+            return RedirectToAction("Index", "Login");
         }
     }
 }

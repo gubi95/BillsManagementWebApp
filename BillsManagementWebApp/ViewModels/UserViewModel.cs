@@ -14,6 +14,14 @@ namespace BillsManagementWebApp.ViewModels
         public string FirstName { get; set; }
         public string LastName { get; set; }
 
+        public string UserDisplayNameFormatted
+        {
+            get
+            {
+                return this.FirstName + " " + this.LastName;
+            }
+        }
+
         public void ApplyFromModel(User objUser)
         {
             this.Username = objUser.Username;

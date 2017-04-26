@@ -14,6 +14,10 @@ namespace BillsManagementWebApp.Controllers
         [HttpGet]        
         public ActionResult Index()
         {
+            if (SessionManager.GetCurrentUser() != null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
             return View();
         }
 
@@ -37,12 +41,23 @@ namespace BillsManagementWebApp.Controllers
             {
                 string strHashedPassword = objUser.Password;
                 bool bIsPasswordCorrect = PasswordHasher.CompareHashes(strPassword, strHashedPassword);
-                SessionManager.SetCurrentUser(objUser);
-                return RedirectToAction("Index", "Home");
+
+                if (bIsPasswordCorrect)
+                {
+                    SessionManager.SetCurrentUser(objUser);
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    SessionManager.SetCurrentUser(null);
+                    TempData["error"] = "wrong_auth";
+                    return RedirectToAction("Index");
+                }
             }
             else
             {
-                return RedirectToAction("Index", new { @error = "wrong_auth" });
+                TempData["error"] = "wrong_auth";
+                return RedirectToAction("Index");
             }
         }
     }
