@@ -73,23 +73,61 @@
         border: 1px solid rgba(25,25,25,0.10);    
     }
 
-    .div-welcome {
-        width: 100%;
-        height: 100%;
+    .div-welcome {        
         text-align: center;
         color: white;        
         font-family: 'Poiret One';
         padding-top: 120px;
+    }
+
+    .div-selected-tab-content {
+        width: 100%;
+        height: 100%;
+        padding-left: 20px;
+        padding-right: 20px;
+        min-height: 639px;
+        padding-bottom: 20px;
+    }
+
+    .div-selected-tab-content .div-selected-tab-content-header {
+        font-family: Abel;
+        font-size: 40px;
+        color: white;
+    }
+
+    .div-selected-tab-content hr {
+        border-color: white;
+        border-width: 2px;
+        width: calc(100% - 2px);
+        margin-top: 10px;
     }
 </style>
 
 <script>
     jQuery(document).ready(function () {
         jQuery('body').on('click', '#tileSignOut', SignOut);
+        jQuery('body').on('click', '#tileCreateBill', GoToCreateBill);
     });
+
+    function GoToCreateBill() {
+        ShowNewSelectedTabContent('#div-create-bill');        
+    }
 
     function SignOut() {        
         jQuery('#formSignOut').submit();
+    }
+
+    function ShowNewSelectedTabContent(selectedTabContentSelector) {
+        jQuery('.div-selected-tab-content').hide();
+        // control defined in _CreateBillPartialView.cshtml
+        jQuery('#cbCreateNewShop').iCheck('uncheck');
+        jQuery(selectedTabContentSelector)
+            .css('opacity', '0')
+            .show()
+            .animate({
+                'opacity': '1',
+                duration: 750
+            });
     }
 </script>
 
@@ -104,7 +142,7 @@
             </div>
         </div>
 
-        <div class="tile">
+        <div id="tileCreateBill" class="tile">
             <div class="tile-content">
                 <span class="tile-header" style="font-size: 34px;">
                     Nowy paragon
@@ -142,7 +180,7 @@
     </div>
 
     <div class="tile-tab-content">
-        <div class="div-welcome">
+        <div class="div-selected-tab-content div-welcome">
             <span class="animate-start-stat-text" style="font-size: 90px; opacity: 0;">
                 Witaj<br />@(Model.UserDisplayNameFormatted)!                
             </span>            
@@ -154,6 +192,12 @@
             <span class="animate-start-stat-text" style="font-size: 45px; font-family: Abel; opacity: 0;">
                 Wydatki w tym miesiącu: 1354,67 zł
             </span>
+        </div>
+
+        <div id="div-create-bill" class="div-selected-tab-content" style="display: none;">
+            <h2 class="div-selected-tab-content-header">Tworzenie paragonu</h2>
+            <hr />
+            @Html.Partial("/Views/Shared/_CreateBillPartialView.cshtml", new BillViewModel())
         </div>
     </div>
 </div>

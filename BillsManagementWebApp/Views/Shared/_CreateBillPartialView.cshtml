@@ -1,0 +1,206 @@
+﻿@using BillsManagementWebApp.ViewModels
+@using BillsManagementWebApp.Models
+@model BillViewModel
+
+@{
+    ApplicationDBContext objApplicationDBContext = new ApplicationDBContext();
+    List<ProductCategory> listProductCategory = objApplicationDBContext.ProductCategories.ToList();
+    string strProductCategoryDropdown = "<select class=\"select-product-category selectpicker\">";
+    foreach (ProductCategory objProductCategory in listProductCategory)
+    {
+        strProductCategoryDropdown += "<option value=\"" + objProductCategory.ProductCategoryID + "\">" + objProductCategory.Name + "</option>";
+    }
+    strProductCategoryDropdown += "</select>";
+}
+
+<script>
+    jQuery(document).ready(function () {
+        jQuery('#dtPurchaseDate').datetimepicker({
+            useCurrent: true,
+            locale: 'pl',
+            format: 'DD.MM.YYYY',
+            ignoreReadonly: true
+        });
+
+        jQuery('.product-price-selector').TouchSpin({
+            verticalbuttons: true,
+            verticalupclass: 'glyphicon glyphicon-plus',
+            verticaldownclass: 'glyphicon glyphicon-minus',
+            min: 1.00,
+            step: 0.01,
+            decimals: 2,
+            initval: 1.00,
+            postfix: "zł"
+        });
+
+        jQuery('#cbCreateNewShop').iCheck({
+            checkboxClass: 'icheckbox_flat-grey',
+            radioClass: 'iradio_flat-grey'
+        }).on('ifChanged', function (event) {
+            var isChecked = jQuery(this).is(':checked');
+            if (isChecked) {
+                jQuery('#ddlShopSelector').selectpicker('hide');
+                jQuery('#txtNewShopName').show();
+            }
+            else {
+                jQuery('#txtNewShopName').hide();
+                jQuery('#ddlShopSelector').selectpicker('show');
+            }
+        });
+
+        jQuery('body').on('click', '#btn-add-product-row', AddNewProductRow);
+
+        jQuery('body').on('click', '.btn-remove-product-row', function () {
+            jQuery(this).closest('.product-row').remove();
+        });
+
+        function AddNewProductRow() {
+            var productRowHTML =
+                '<div class="row product-row" style="padding-bottom: 10px;">' +
+                    '<div class="col-md-4" style="padding-top: 4px; padding-left: 40px;">' +
+                        '<input type="text" class="form-control"/>' +
+                    '</div>' +
+                    '<div class="col-md-4" style="padding-top: 4px;">' +
+                        '<input type="text" class="product-price-selector" style="border-top-left-radius: 4px; border-bottom-left-radius: 4px;">' +
+                    '</div>' +
+                    '<div class="col-md-3" style="padding-top: 4px;">' +
+                        '@Html.Raw(strProductCategoryDropdown)' +
+                    '</div>' +
+                    '<div class="col-md-1">' +
+                        '<a class="btn btn-default btn-md btn-remove-product-row"><i class="fa fa-times"></i></a>' +
+                    '</div>' +
+                '</div>';
+            jQuery(productRowHTML).insertAfter(jQuery('.product-row').last());
+
+            jQuery(jQuery('.product-price-selector').last()).TouchSpin({
+                verticalbuttons: true,
+                verticalupclass: 'glyphicon glyphicon-plus',
+                verticaldownclass: 'glyphicon glyphicon-minus',
+                min: 1.00,
+                step: 0.01,
+                decimals: 2,
+                initval: 1.00,
+                postfix: "zł"
+            });
+
+            jQuery('.select-product-category').last().selectpicker();
+        }
+    });
+</script>
+
+<style>
+    .custom-label {
+        font-family: Lato;
+        color: white;
+    }
+
+    #formCreateBill .bootstrap-select {
+        width: 100%;
+    }
+
+    .btn-transparent {
+        min-width: 100px;
+        height: 40px;
+        background-color: rgba(0,0,0,0);
+        border: 1px solid white;
+        color: white;
+        font-family: Lato;
+        text-align: center;
+        text-decoration: none;        
+        font-size: 14px;
+        border-radius: 0;
+        -webkit-transition: all 0.20s;
+        transition: all 0.20s;
+    }
+
+    .btn-transparent:hover {
+        background-color: rgba(80,80,80, 0.75) !important;
+        color: white !important;       
+        border-color: white !important;
+    }
+</style>
+
+<form id="formCreateBill">
+    <div class="row">
+        <div class="col-md-2" style="padding-top: 4px;">
+            <span class="custom-label">Data zakupów:</span>
+        </div>
+        <div class="col-md-10">
+            <div class='input-group date' id='dtPurchaseDate' style="width: 250px;">
+                <input type='text' class="form-control" readonly="readonly" />
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="padding-top: 10px;">
+        <div class="col-md-2" style="padding-top: 4px;">
+            <span class="custom-label">Sklep:</span>
+        </div>
+        <div class="col-md-2" style="padding-top: 7px;">
+            <label class="custom-label" for="cbCreateNewShop" style="margin-left: 8px; font-weight: normal;">Nowy sklep</label>
+            <div class="iradio checked" style="float: left;">
+                <input type="checkbox" id="cbCreateNewShop" checked>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" id="txtNewShopName" style="display: none;" />
+            <select class="selectpicker" id="ddlShopSelector">
+                @{
+                    int nCurrentUserID = BillsManagementWebApp.Shared.SessionManager.GetCurrentUser().UserID;
+                    List<Shop> listShop = objApplicationDBContext
+                        .Shops
+                        .Include("UserOwner")
+                        .Where(x => x.UserOwner.UserID == nCurrentUserID)
+                        .ToList();
+                    listShop = listShop.Count == 0 ? new List<Shop>() { new Shop() { ShopID = -1, ShopName = "Brak sklepów" } } : listShop;
+                    foreach (Shop objShop in listShop)
+                    {
+                        <option value="@objShop.ShopID">@objShop.ShopName</option>
+                    }
+                }
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <h2 style="color: white; font-family: Abel;">Produkty:</h2>
+        </div>
+    </div>          
+    <div class="row">
+        <div class="col-md-4" style="padding-top: 4px; padding-left: 40px;">
+            <span class="custom-label">Produkt:</span>
+        </div>
+        <div class="col-md-4" style="padding-top: 4px;">
+            <span class="custom-label">Cena:</span>
+        </div>
+        <div class="col-md-3" style="padding-top: 4px;">
+            <span class="custom-label">Kategoria:</span>
+        </div>
+        <div class="col-md-1">
+            <span class="custom-label">Usuń:</span>
+        </div>
+    </div>
+    <div class="row product-row" style="padding-bottom: 10px;">
+        <div class="col-md-4" style="padding-top: 4px; padding-left: 40px;">
+            <input type="text" class="form-control"/>
+        </div>
+        <div class="col-md-4" style="padding-top: 4px;">
+            <input type="text" class="product-price-selector" style="border-top-left-radius: 4px; border-bottom-left-radius: 4px;">                      
+        </div>
+        <div class="col-md-3" style="padding-top: 4px;">
+            @Html.Raw(strProductCategoryDropdown)
+        </div>
+        <div class="col-md-1">
+            
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12" style="padding-left: 40px; padding-right: 53px;">
+            <a id="btn-add-product-row" class="btn btn-default btn-lg btn-transparent">Dodaj produkt</a>
+            <a id="btn-add-product-row" class="btn btn-default btn-lg btn-transparent" style="float: right;">Zapisz</a>
+        </div>
+    </div>
+</form>                    

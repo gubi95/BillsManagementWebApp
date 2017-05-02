@@ -8,7 +8,17 @@
     <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Poiret+One" rel="stylesheet"> 
     <link href="https://fonts.googleapis.com/css?family=Abel" rel="stylesheet"> 
-    <link href="/Assets/js/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="/Assets/js/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet" /> 
+    <link href="/Assets/js/bootstrap-datetimepicker-master/src/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+    <script src="/Assets/js/moment-develop/moment.js"></script>
+    <script src="/Assets/js/moment-develop/locale/pl.js"></script>
+    <script src="/Assets/js/bootstrap-datetimepicker-master/src/js/bootstrap-datetimepicker.js"></script>
+    <link href="/Assets/js/bootstrap-touchspin-master/dist/jquery.bootstrap-touchspin.min.css" rel="stylesheet" />
+    <script src="/Assets/js/bootstrap-touchspin-master/dist/jquery.bootstrap-touchspin.min.js"></script>
+    <link href="/Assets/js/bootstrap-select-1.12.2/dist/css/bootstrap-select.min.css" rel="stylesheet" />
+    <script src="/Assets/js/bootstrap-select-1.12.2/dist/js/bootstrap-select.min.js"></script>
+    <link href="~/Assets/js/icheck-1.x/skins/flat/_all.css" rel="stylesheet" />
+    <script src="/Assets/js/icheck-1.x/icheck.min.js"></script>
     <title>@ViewBag.Title</title>
 </head>
 <body>
@@ -20,6 +30,9 @@
 
     <div class="pane">
         <div class="main-container">
+            <div class="ajax-wheel" style="display: none;">
+                <img src="~/Assets/img/ajax-wheel1.gif" />
+            </div>
             @RenderBody()
         </div>        
     </div>
@@ -38,19 +51,8 @@
         height: 100%;
     }
 
-    button:hover, a:hover {
-        background-color: #555 !important;
-        border-color: #444 !important;
-        color: #DDD !important;
-    }
-
     .top-bar:hover {
         background-color: rgba(25,25,25,0.5) !important;
-    }
-
-    button, a {
-        -webkit-transition: all 0.20s;
-        transition: all 0.20s;
     }
 
     .top-bar {
@@ -79,8 +81,9 @@
 
     .pane {
         width: 100%;               
-        height: 100%;
+        height: auto;
         padding-top: 40px;
+        padding-bottom: 40px;
         background-color: rgba(25,25,25,0.25);        
         border-bottom: 0;
         border-left: 0;
@@ -95,6 +98,24 @@
         padding: 14px;
         margin-top: 10px;
         height: 100%;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .ajax-wheel {    
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 100;
+        background-color: rgba(255,255,255,0.65);
+    }
+
+    .ajax-wheel img {
+        position: absolute;
+        left: calc(50% - 75px);
+        top: calc(50% - 75px);
     }
 
 </style>
@@ -105,6 +126,30 @@
         SetTopBarDateTime();
         setInterval(SetTopBarDateTime, 1000);
     });
+
+    function ShowHideAjaxWheel(showAjaxWheel) {
+        if (showAjaxWheel) {
+            jQuery('.ajax-wheel')
+                .css('opacity', '0')
+                .show()
+                .animate({
+                    'opacity': '1',
+                    duration: 750
+                });
+        }
+        else {
+            jQuery('.ajax-wheel')                
+                .animate({
+                    'opacity': '0',
+                    duration: 750
+                });                
+            setTimeout(function() {
+                jQuery('.ajax-wheel')
+                    .hide()
+                    .css('opacity', '1');
+            }, 750);
+        }
+    }
 
     function SetTopBarDateTime() {
         var date = new Date();
