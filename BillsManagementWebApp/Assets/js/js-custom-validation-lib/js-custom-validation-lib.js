@@ -1,14 +1,28 @@
-﻿var validationTags = ['not-empty'];
-var validationFunctionsNames = ['notEmpty'];
+﻿var validationTags = ['not-empty', 'reg-exp', 'pl-date'];
+var validationFunctionsNames = ['notEmpty', 'regExp', 'plDate'];
 var checkValidationFunctions = {
     notEmpty: function ($field) {
         return $field.val().trim() != '';
+    },
+    regExp: function ($field, regularExpression) {        
+        return new RegExp(regularExpression).test($field.val());
+    },
+    plDate: function ($field) {
+        var datePLValues = $field.val().split('.').filter(Boolean);        
+        return datePLValues.length == 3 && new Date([datePLValues[2], datePLValues[1], datePLValues[0]].join('-')).getTime() > 0;        
     }
 };
 
 var valdiationErrorMessages = [
-    'To pole nie może być puste!'
+    'To pole nie może być puste!',
+    'Wartość pola jest w nieprawidłowym formacie!',
+    'Podana data jest nieprawidłowa!'
 ];
+
+function RemoveFieldFromValidation($field) {
+    $field.removeAttr('data-validators');
+    $field.closest('div[class*="col-md"]').find('.val-err-msg').remove();
+}
 
 function Validator(containerSelector) {
     this.fields = [];
@@ -18,7 +32,20 @@ function Validator(containerSelector) {
         that.fields.push(jQuery(this));
     });
 
-    this.validate = function() { return ValidateContainer(this) };
+    this.validate = function (includeNewAddedFields) {
+        if (arguments.length == 0) {
+            return ValidateContainer(this, false);
+        }
+
+        if (includeNewAddedFields) {
+            that.fields = [];
+            jQuery(containerSelector).find('[data-validators!=""][data-validators]').each(function () {
+                that.fields.push(jQuery(this));
+            });
+        }
+
+        return ValidateContainer(this);        
+    };
 }
 
 function ValidateContainer(container) {
@@ -31,16 +58,21 @@ function ValidateContainer(container) {
         for (var j = 0; j < validators.length; j++) {
 
             for (var k = 0; k < validationTags.length; k++) {
-
                 if (validationTags[k] == validators[j]) {
-                    if (checkValidationFunctions[validationFunctionsNames[k]](container.fields[i]) == false) {
+                    var bValidatorPassed = false;
+                    // not empty || pl-date
+                    if (k == 0 || k == 2) {
+                        bValidatorPassed = checkValidationFunctions[validationFunctionsNames[k]](container.fields[i]);
+                    }
+                    // reg exp
+                    else if (k == 1) {
+                        var regExp = container.fields[i].attr('data-valid-reg-exp') != undefined ? container.fields[i].attr('data-valid-reg-exp') : '';
+                        bValidatorPassed = checkValidationFunctions[validationFunctionsNames[k]](container.fields[i], regExp);
+                    }
+
+                    if (!bValidatorPassed) {
                         container.fields[i].closest('div[class*="col-md"]').find('.val-err-msg').remove();
                         container.fields[i].closest('div[class*="col-md"]').append('<span class="val-err-msg" style="color: #54001B; font-family: Lato; font-size: 12px;">' + valdiationErrorMessages[k] + '</span>');
-
-                        //if (container.fields[i].is('input:text') || container.fields[i].is('input:password')) {
-                        //    container.fields[i].css('box-shadow', 'inset 0 1px 1px rgba(255,0,0,.075)', 'important');
-                        //}
-
                         isFormValid = false;
                         break;
                     }
@@ -52,7 +84,7 @@ function ValidateContainer(container) {
         }
 
         if (validatorsPassed == validators.length) {
-            container.fields[i].parent().find('.val-err-msg').remove();
+            container.fields[i].closest('div[class*="col-md"]').find('.val-err-msg').remove();
         }
     }
 

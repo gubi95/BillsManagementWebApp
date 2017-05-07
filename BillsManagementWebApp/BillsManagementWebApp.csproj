@@ -1201,6 +1201,7 @@
     <Content Include="Assets\js\moment-develop\templates\default.js" />
     <Content Include="Assets\js\moment-develop\templates\locale-header.js" />
     <Content Include="Assets\js\moment-develop\templates\test-header.js" />
+    <Content Include="Assets\js\scripts.js" />
     <Content Include="Content\bootstrap-datetimepicker.css" />
     <Content Include="Content\bootstrap-datetimepicker.min.css" />
     <Content Include="Content\bootstrap-theme.css" />

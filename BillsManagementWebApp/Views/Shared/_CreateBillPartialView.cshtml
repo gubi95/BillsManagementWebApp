@@ -5,7 +5,7 @@
 @{
     ApplicationDBContext objApplicationDBContext = new ApplicationDBContext();
     List<ProductCategory> listProductCategory = objApplicationDBContext.ProductCategories.ToList();
-    string strProductCategoryDropdown = "<select class=\"select-product-category selectpicker\">";
+    string strProductCategoryDropdown = "<select class=\"select-product-category selectpicker\" data-live-search=\"true\">";
     foreach (ProductCategory objProductCategory in listProductCategory)
     {
         strProductCategoryDropdown += "<option value=\"" + objProductCategory.ProductCategoryID + "\">" + objProductCategory.Name + "</option>";
@@ -14,7 +14,11 @@
 }
 
 <script>
+    var createBillFormValidator = null;
+
     jQuery(document).ready(function () {
+        createBillFormValidator = new Validator('#formCreateBill');         
+
         jQuery('#dtPurchaseDate').datetimepicker({
             useCurrent: true,
             locale: 'pl',
@@ -26,11 +30,23 @@
             verticalbuttons: true,
             verticalupclass: 'glyphicon glyphicon-plus',
             verticaldownclass: 'glyphicon glyphicon-minus',
-            min: 1.00,
+            min: 0.01,
+            max: 1000000.00,
             step: 0.01,
             decimals: 2,
             initval: 1.00,
             postfix: "zł"
+        });
+
+        jQuery('.product-quantity-selector').TouchSpin({
+            verticalbuttons: true,
+            verticalupclass: 'glyphicon glyphicon-plus',
+            verticaldownclass: 'glyphicon glyphicon-minus',
+            min: 0.01,
+            max: 1000000.00,
+            step: 0.01,
+            decimals: 2,
+            initval: 1.00,            
         });
 
         jQuery('#cbCreateNewShop').iCheck({
@@ -40,10 +56,14 @@
             var isChecked = jQuery(this).is(':checked');
             if (isChecked) {
                 jQuery('#ddlShopSelector').selectpicker('hide');
-                jQuery('#txtNewShopName').show();
+                jQuery('#txtNewShopName')
+                    .attr('data-validators', 'not-empty')
+                    .show();
+                
             }
             else {
                 jQuery('#txtNewShopName').hide();
+                RemoveFieldFromValidation(jQuery('#txtNewShopName'));
                 jQuery('#ddlShopSelector').selectpicker('show');
             }
         });
@@ -58,10 +78,13 @@
             var productRowHTML =
                 '<div class="row product-row" style="padding-bottom: 10px;">' +
                     '<div class="col-md-4" style="padding-top: 4px; padding-left: 40px;">' +
-                        '<input type="text" class="form-control"/>' +
+                        '<input type="text" class="form-control" data-validators="not-empty" />' +
                     '</div>' +
-                    '<div class="col-md-4" style="padding-top: 4px;">' +
-                        '<input type="text" class="product-price-selector" style="border-top-left-radius: 4px; border-bottom-left-radius: 4px;">' +
+                    '<div class="col-md-2" style="padding-top: 4px;">' +
+                        '<input type="text" class="product-quantity-selector" style="border-top-left-radius: 4px; border-bottom-left-radius: 4px;" data-validators="not-empty,reg-exp" data-valid-reg-exp="^(?:\\d*((\\.)|(,))\\d{2}|\\d+)$">' +
+                    '</div>' +
+                    '<div class="col-md-2" style="padding-top: 4px;">' +
+                        '<input type="text" class="product-price-selector" style="border-top-left-radius: 4px; border-bottom-left-radius: 4px;" data-validators="not-empty,reg-exp" data-valid-reg-exp="^(?:\\d*((\\.)|(,))\\d{2}|\\d+)$">' +
                     '</div>' +
                     '<div class="col-md-3" style="padding-top: 4px;">' +
                         '@Html.Raw(strProductCategoryDropdown)' +
@@ -76,16 +99,79 @@
                 verticalbuttons: true,
                 verticalupclass: 'glyphicon glyphicon-plus',
                 verticaldownclass: 'glyphicon glyphicon-minus',
-                min: 1.00,
+                min: 0.01,
+                max: 1000000.00,
                 step: 0.01,
                 decimals: 2,
                 initval: 1.00,
                 postfix: "zł"
             });
 
+            jQuery(jQuery('.product-quantity-selector').last()).TouchSpin({
+                verticalbuttons: true,
+                verticalupclass: 'glyphicon glyphicon-plus',
+                verticaldownclass: 'glyphicon glyphicon-minus',
+                min: 0.01,
+                max: 1000000.00,
+                step: 0.01,
+                decimals: 2,
+                initval: 1.00,                
+            });
+
             jQuery('.select-product-category').last().selectpicker();
         }
     });
+
+    function SaveNewBill() {
+        if (!createBillFormValidator.validate(true)) {
+            return;
+        }
+
+        var objStore = jQuery('#cbCreateNewShop').is(':checked') ?
+            {
+                StoreID: -1,
+                StoreName: jQuery('#txtNewShopName').val().trim()
+            } :
+            {
+                StoreID: jQuery('#ddlShopSelector').selectpicker('val') * 1,  
+                StoreName: ''
+            };
+
+        var arrProducts = [];
+        jQuery('.product-row').each(function () {
+            var productName = jQuery(this).find('input[type="text"]').eq(0).val();
+            var productQuantity = jQuery(this).find('.product-quantity-selector').val() * 1.00;
+            var productPrice = jQuery(this).find('.product-price-selector').val() * 1.00;
+            var productCategoryID = jQuery(this).find('.select-product-category').selectpicker('val') * 1;
+
+            arrProducts.push({
+                ProductName: productName,
+                Quantity: productQuantity,
+                Price: productPrice,
+                ProductCategoryID: productCategoryID
+            });
+        });
+
+        var objBill = {
+            PurchaseDate: FormatJSDateToCSharpDate(jQuery('#dtPurchaseDate').data("DateTimePicker").date()._d),
+            Store: objStore,
+            Products: arrProducts
+        };
+
+        jQuery.ajax({
+            type: 'POST',
+            url: '/Handlers/BillHandler.ashx?Action=Create',
+            contentType: 'application/json',
+            data: JSON.stringify(objBill),
+            success: function () {
+
+            },
+            error: function () {
+
+            }
+        });
+    }
+
 </script>
 
 <style>
@@ -127,7 +213,7 @@
         </div>
         <div class="col-md-10">
             <div class='input-group date' id='dtPurchaseDate' style="width: 250px;">
-                <input type='text' class="form-control" readonly="readonly" />
+                <input type='text' class="form-control" readonly="readonly" data-validators="not-empty,pl-date" />
                 <span class="input-group-addon">
                     <span class="glyphicon glyphicon-calendar"></span>
                 </span>
@@ -146,7 +232,7 @@
         </div>
         <div class="col-md-3">
             <input type="text" class="form-control" id="txtNewShopName" style="display: none;" />
-            <select class="selectpicker" id="ddlShopSelector">
+            <select class="selectpicker" id="ddlShopSelector" data-live-search="true">
                 @{
                     int nCurrentUserID = BillsManagementWebApp.Shared.SessionManager.GetCurrentUser().UserID;
                     List<Shop> listShop = objApplicationDBContext
@@ -172,9 +258,12 @@
         <div class="col-md-4" style="padding-top: 4px; padding-left: 40px;">
             <span class="custom-label">Produkt:</span>
         </div>
-        <div class="col-md-4" style="padding-top: 4px;">
-            <span class="custom-label">Cena:</span>
+        <div class="col-md-2" style="padding-top: 4px;">
+            <span class="custom-label">Ilość:</span>
         </div>
+        <div class="col-md-2" style="padding-top: 4px;">
+            <span class="custom-label">Cena całkowita:</span>
+        </div>        
         <div class="col-md-3" style="padding-top: 4px;">
             <span class="custom-label">Kategoria:</span>
         </div>
@@ -184,11 +273,14 @@
     </div>
     <div class="row product-row" style="padding-bottom: 10px;">
         <div class="col-md-4" style="padding-top: 4px; padding-left: 40px;">
-            <input type="text" class="form-control"/>
+            <input type="text" class="form-control" data-validators="not-empty" />
         </div>
-        <div class="col-md-4" style="padding-top: 4px;">
-            <input type="text" class="product-price-selector" style="border-top-left-radius: 4px; border-bottom-left-radius: 4px;">                      
+        <div class="col-md-2" style="padding-top: 4px;">
+            <input type="text" class="product-quantity-selector" style="border-top-left-radius: 4px; border-bottom-left-radius: 4px;" data-validators="not-empty,reg-exp" data-valid-reg-exp="^(?:\d*((\.)|(,))\d{2}|\d+)$">
         </div>
+        <div class="col-md-2" style="padding-top: 4px;">
+            <input type="text" class="product-price-selector" style="border-top-left-radius: 4px; border-bottom-left-radius: 4px;" data-validators="not-empty,reg-exp" data-valid-reg-exp="^(?:\d*((\.)|(,))\d{2}|\d+)$">                      
+        </div>        
         <div class="col-md-3" style="padding-top: 4px;">
             @Html.Raw(strProductCategoryDropdown)
         </div>
@@ -200,7 +292,7 @@
     <div class="row">
         <div class="col-md-12" style="padding-left: 40px; padding-right: 53px;">
             <a id="btn-add-product-row" class="btn btn-default btn-lg btn-transparent">Dodaj produkt</a>
-            <a id="btn-add-product-row" class="btn btn-default btn-lg btn-transparent" style="float: right;">Zapisz</a>
+            <a class="btn btn-default btn-lg btn-transparent" style="float: right;" onclick="SaveNewBill(); return false;">Zapisz</a>
         </div>
     </div>
 </form>                    
