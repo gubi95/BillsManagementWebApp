@@ -32,7 +32,13 @@ namespace BillsManagementWebApp.Handlers
             public DateTime PurchaseDate { get; set; }
             public ViewStore Store { get; set; }
             public List<ViewProduct> Products { get; set; }            
-        }  
+        }
+
+        private class Response
+        {
+            public bool Success { get; set; }
+            public string Message { get; set; }
+        }
 
         public void ProcessRequest(HttpContext objHttpContext)
         {
@@ -41,66 +47,74 @@ namespace BillsManagementWebApp.Handlers
 
             if (strAction.Equals("Create"))
             {
-                ViewBill objViewBill = JsonConvert.DeserializeObject<ViewBill>(strJSON);
-
-                ApplicationDBContext objApplicationDBContext = new ApplicationDBContext();
-
-                int nCurrentUserID = SessionManager.GetCurrentUser().UserID;
-
-                Models.User objUser = objApplicationDBContext                                        
-                                        .Users
-                                        .Include("Bills")
-                                        .Where(x => x.UserID == nCurrentUserID).FirstOrDefault();
-
-                List<ProductCategory> listProductCategory = objApplicationDBContext
-                                                            .ProductCategories
-                                                            .ToList();
-
-                Shop objShop = objApplicationDBContext
-                                        .Shops
-                                        .Include("UserOwner")
-                                        .Where(x => x.UserOwner.UserID == nCurrentUserID &&
-                                            x.ShopID == objViewBill.Store.StoreID)
-                                        .FirstOrDefault();
-
-                if (objShop == null)
+                try
                 {
-                    objShop = new Shop()
-                    {                           
-                        ShopName = objViewBill.Store.StoreName,
-                        UserOwner = objApplicationDBContext.Users.Where(x => x.UserID == nCurrentUserID).FirstOrDefault()
+                    ViewBill objViewBill = JsonConvert.DeserializeObject<ViewBill>(strJSON);
+
+                    ApplicationDBContext objApplicationDBContext = new ApplicationDBContext();
+
+                    int nCurrentUserID = SessionManager.GetCurrentUser().UserID;
+
+                    Models.User objUser = objApplicationDBContext
+                                            .Users
+                                            .Include("Bills")
+                                            .Where(x => x.UserID == nCurrentUserID).FirstOrDefault();
+
+                    List<ProductCategory> listProductCategory = objApplicationDBContext
+                                                                .ProductCategories
+                                                                .ToList();
+
+                    Shop objShop = objApplicationDBContext
+                                            .Shops
+                                            .Include("UserOwner")
+                                            .Where(x => x.UserOwner.UserID == nCurrentUserID &&
+                                                x.ShopID == objViewBill.Store.StoreID)
+                                            .FirstOrDefault();
+
+                    if (objShop == null)
+                    {
+                        objShop = new Shop()
+                        {
+                            ShopName = objViewBill.Store.StoreName,
+                            UserOwner = objApplicationDBContext.Users.Where(x => x.UserID == nCurrentUserID).FirstOrDefault()
+                        };
+
+                        objApplicationDBContext.Shops.Add(objShop);
+                        objApplicationDBContext.SaveChanges();
+                    }
+
+                    List<BillEntry> listBillEntry = new List<BillEntry>();
+
+                    foreach (ViewProduct objViewProduct in objViewBill.Products)
+                    {
+                        listBillEntry.Add(new BillEntry()
+                        {
+                            Category = listProductCategory.Find(x => x.ProductCategoryID == objViewProduct.ProductCategoryID),
+                            Price = objViewProduct.Price,
+                            ProductName = objViewProduct.ProductName,
+                            Quantity = objViewProduct.Quantity
+                        });
+                    }
+
+                    Bill objBill = new Bill()
+                    {
+                        PurchaseDate = objViewBill.PurchaseDate,
+                        Shop = objShop,
+                        Entries = listBillEntry
                     };
 
-                    objApplicationDBContext.Shops.Add(objShop);
+                    objUser.Bills.Add(objBill);
                     objApplicationDBContext.SaveChanges();
+
+                    objHttpContext.Response.ContentType = "application/json";
+                    objHttpContext.Response.Write(JsonConvert.SerializeObject(new Response() { Success = true, Message = "OK" }));
                 }
-
-                List<BillEntry> listBillEntry = new List<BillEntry>();
-
-                foreach (ViewProduct objViewProduct in objViewBill.Products)
+                catch (Exception ex)
                 {
-                    listBillEntry.Add(new BillEntry()
-                    {
-                        Category = listProductCategory.Find(x => x.ProductCategoryID == objViewProduct.ProductCategoryID),
-                        Price = objViewProduct.Price,
-                        ProductName = objViewProduct.ProductName,
-                        Quantity = objViewProduct.Quantity
-                    });
+                    objHttpContext.Response.ContentType = "application/json";
+                    objHttpContext.Response.Write(JsonConvert.SerializeObject(new Response() { Success = false, Message = ex.ToString() }));
                 }
-
-                Bill objBill = new Bill()
-                {
-                    PurchaseDate = objViewBill.PurchaseDate,
-                    Shop = objShop,
-                    Entries = listBillEntry                    
-                };
-
-                objUser.Bills.Add(objBill);
-                objApplicationDBContext.SaveChanges(); 
             }
-
-            objHttpContext.Response.ContentType = "text/plain";
-            objHttpContext.Response.Write("Hello World");
         }
 
         public bool IsReusable

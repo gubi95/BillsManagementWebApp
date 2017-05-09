@@ -19,13 +19,13 @@
         height: 120px;             
     }
 
-    .tile:hover {
+    .tile-highlighted, .tile:hover {
         background-color: rgba(25,25,25,0.40);
         -moz-transform: translate(-2px, -2px);
         -ms-transform: translate(-2px, -2px);
         -o-transform: translate(-2px, -2px);
         -webkit-transform: translate(-2px, -2px);
-        transform: translate(-2px, -2px)
+        transform: translate(-2px, -2px);
     }
 
     .tile-header {
@@ -105,6 +105,10 @@
 
 <script>
     jQuery(document).ready(function () {
+        jQuery('body').on('click', '.tile', function () {
+            jQuery('.tile-highlighted').removeClass('tile-highlighted');
+            jQuery(this).addClass('tile-highlighted');
+        });
         jQuery('body').on('click', '#tileSignOut', SignOut);
         jQuery('body').on('click', '#tileCreateBill', GoToCreateBill);
     });
@@ -119,8 +123,8 @@
 
     function ShowNewSelectedTabContent(selectedTabContentSelector) {
         jQuery('.div-selected-tab-content').hide();
-        // control defined in _CreateBillPartialView.cshtml
-        jQuery('#cbCreateNewShop').iCheck('uncheck');
+        // defined in _CreateBillPartialView.cshtml
+        ResetCreateBillForm();
         jQuery(selectedTabContentSelector)
             .css('opacity', '0')
             .show()

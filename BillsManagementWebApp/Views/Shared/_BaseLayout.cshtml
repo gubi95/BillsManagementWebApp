@@ -23,6 +23,13 @@
     <title>@ViewBag.Title</title>
 </head>
 <body>
+    <div id="alert-success" class="alert" style="display: none;">
+        <i class="fa fa-smile-o"></i>&nbsp;<span>Paragon został dodany!</span>
+    </div>
+    <div id="alert-error" class="alert" style="display: none;">
+        <i class="fa fa-frown-o"></i>&nbsp;<span>Coś poszło nie tak, proszę spróbować ponownie!</span>
+    </div>
+
     <div class="top-bar">        
         <div class="top-bar-dt">
 
@@ -32,7 +39,7 @@
     <div class="pane">
         <div class="main-container">
             <div class="ajax-wheel" style="display: none;">
-                <img src="~/Assets/img/ajax-wheel1.gif" />
+                <img src="~/Assets/img/ajax-wheel.svg" />
             </div>
             @RenderBody()
         </div>        
@@ -119,6 +126,20 @@
         top: calc(50% - 75px);
     }
 
+    .alert {
+        width: auto;
+        min-height: 24px;
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        z-index: 10000;
+        border-radius: 4px;
+        background-color: #FFF;
+        border: 1px solid #CCC;
+        font-family: Lato;
+        font-size: 17px;
+    }
+
 </style>
 
 <script>
@@ -127,6 +148,51 @@
         SetTopBarDateTime();
         setInterval(SetTopBarDateTime, 1000);
     });
+
+    function HideAllAlerts(callback) {
+        jQuery('.alert').animate({
+            'opacity': '0',
+            duration: 750
+        });                
+        setTimeout(function() {
+            jQuery('.alert')
+                .hide()
+                .css('opacity', '1');            
+        }, 750);
+    }
+
+    function ShowAlert(selector) {
+        jQuery(selector)
+            .css('opacity', '0')
+            .show()
+            .animate({
+                'opacity': '1',
+                duration: 750
+            });
+    }
+
+    function ShowAlertSuccess(text, hideAfter) {
+        HideAllAlerts();
+        setTimeout(function () {
+            jQuery('#alert-success span').html(text);
+            ShowAlert('#alert-success');
+        }, 750);
+
+        setTimeout(function () {
+            HideAllAlerts();
+        }, hideAfter + 750);
+    }
+
+    function ShowAlertError(text, hideAfter) {
+        HideAllAlerts();
+        setTimeout(function () {
+            jQuery('#alert-error span').html(text);
+            ShowAlert('#alert-error');
+        }, 750);
+        setTimeout(function () {
+            HideAllAlerts();
+        }, hideAfter + 750);
+    }
 
     function ShowHideAjaxWheel(showAjaxWheel) {
         if (showAjaxWheel) {
