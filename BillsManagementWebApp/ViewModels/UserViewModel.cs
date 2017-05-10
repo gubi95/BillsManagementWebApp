@@ -13,6 +13,7 @@ namespace BillsManagementWebApp.ViewModels
         public string Email { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public List<BillViewModel> Bills { get; set; }
 
         public string UserDisplayNameFormatted
         {
@@ -29,6 +30,12 @@ namespace BillsManagementWebApp.ViewModels
             this.Email = objUser.Email;
             this.FirstName = objUser.FirstName;
             this.LastName = objUser.LastName;
+
+            this.Bills = new List<BillViewModel>();
+            if (objUser.Bills != null)
+            {
+                this.Bills = objUser.Bills.Select(x => new BillViewModel(x)).ToList();
+            }
         }
 
         public void ApplyToModel(ref User objUser)

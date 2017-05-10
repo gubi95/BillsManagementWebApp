@@ -111,10 +111,15 @@
         });
         jQuery('body').on('click', '#tileSignOut', SignOut);
         jQuery('body').on('click', '#tileCreateBill', GoToCreateBill);
+        jQuery('body').on('click', '#tileBillsList', GoToBillsList);
     });
 
     function GoToCreateBill() {
         ShowNewSelectedTabContent('#div-create-bill');        
+    }
+
+    function GoToBillsList() {
+        ShowNewSelectedTabContent('#div-bills-list');
     }
 
     function SignOut() {        
@@ -137,7 +142,7 @@
 
 <div class="grid">
     <div class="tile-wrapper">
-        <div class="tile">
+        <div id="tileBillsList" class="tile">
             <div class="tile-content">
                 <span class="tile-header">
                     Paragony
@@ -202,6 +207,12 @@
             <h2 class="div-selected-tab-content-header">Tworzenie paragonu</h2>
             <hr />
             @Html.Partial("/Views/Shared/_CreateBillPartialView.cshtml", new BillViewModel())
+        </div>
+
+        <div id="div-bills-list" class="div-selected-tab-content" style="display: none;">
+            <h2 class="div-selected-tab-content-header">Paragony</h2>
+            <hr />
+            @Html.Partial("/Views/Shared/_BillsListPartialView.cshtml", Model.Bills)
         </div>
     </div>
 </div>

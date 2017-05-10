@@ -1,0 +1,130 @@
+﻿@using BillsManagementWebApp.ViewModels
+@using BillsManagementWebApp.Models
+@model List<BillViewModel>
+
+<script>
+    jQuery(document).ready(function () {
+        jQuery('#tableBillsList tfoot th').each(function () {
+            if (jQuery(this).attr('data-no-filter') != 'true') {
+                jQuery(this).html('<input type="text" class="form-control" style="width: 100%;" placeholder="Szukaj: ' + jQuery(this).text().toLowerCase() + '" />');
+            }
+        });
+        
+        var table = jQuery('#tableBillsList').DataTable({
+            'initComplete': function(settings, json) {
+                jQuery('#tableBillsList_length select').selectpicker();
+            },
+            "order": [[ 0, "desc" ]],
+            language: {
+                processing:     'Ładowanie... proszę czekać...',
+                search:         '<i class="fa fa-search"></i>&nbsp;Szukaj',
+                lengthMenu:     'Pokaż _MENU_ pozycji',
+                info:           'Znaleziono _END_ z _MAX_ rekordów',
+                infoEmpty:      'Brak rekordów do wyświetlenia',
+                infoFiltered:   '',
+                infoPostFix:    '',
+                loadingRecords: 'Ładowanie... proszę czekać...',
+                zeroRecords:    'Brak rekordów do wyświetlenia',
+                emptyTable:     'Brak rekordów do wyświetlenia',
+                paginate: {
+                    first:      'Pierwszy',
+                    previous:   'Wstecz',
+                    next:       'Dalej',
+                    last:       'Ostatni'
+                },
+                aria: {
+                    sortAscending:  ": activer pour trier la colonne par ordre croissant",
+                    sortDescending: ": activer pour trier la colonne par ordre décroissant"
+                }
+            }
+        });
+        
+        table.columns().every(function () {
+            var that = this;
+            jQuery('input', this.footer()).on('keyup change', function () {
+                if (that.search() !== this.value) {
+                    that
+                        .search(this.value)
+                        .draw();
+                }
+            });
+        });
+    });
+</script>
+
+<style>
+
+    #tableBillsList thead tr th, #tableBillsList tfoot tr th {
+        background-color: #FFF;
+    }
+
+    #tableBillsList thead tr th {
+        border-bottom: 0;
+    }
+
+    #tableBillsList tfoot tr th {
+        text-align: center;
+    }
+
+    #tableBillsList tbody tr:hover td {
+        background-color: #E3E3E3;        
+    }
+
+    #tableBillsList tbody .even td {
+        background-color: #EEE;        
+    }
+
+    #tableBillsList tbody td {
+        padding-top: 3px;
+        padding-bottom: 3px;
+    }
+
+    #tableBillsList thead th:last-child {
+        width: 20% !important;
+    }
+
+    #tableBillsList_filter input[type="search"] {
+        width: 300px;
+        margin-top: 4px;
+    }
+
+    #tableBillsList_filter label, #tableBillsList_length label, #tableBillsList_info {
+        color: #FFF;
+    }
+
+    #tableBillsList_filter label, #tableBillsList_length label {
+        margin-top: 3px;
+    }
+</style>
+
+<table id="tableBillsList" class="table table-striped table-bordered" width="100%" cellspacing="0" style="border: 0;">
+    <thead>
+        <tr>
+            <th style="border-top-left-radius: 4px;">Data zakupów</th>
+            <th>Kwota</th>            
+            <th>Ilość pozycji</th>            
+            <th style="border-top-right-radius: 4px;"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            foreach (BillViewModel objBillViewModel in Model)
+            {
+                <tr>
+                    <td style="padding-top: 7px;">@objBillViewModel.PurchaseDate.ToString("d", new System.Globalization.CultureInfo("pl-PL"))</td>
+                    <td style="padding-top: 7px;">@objBillViewModel.Entries.Sum(x => x.Price).ToString("C", new System.Globalization.CultureInfo("pl-PL"))</td>
+                    <td style="padding-top: 7px;">@objBillViewModel.Entries.Count</td>
+                    <td style="text-align: center;"><a class="btn btn-default btn-sm"><i class="fa fa-pencil"></i>&nbsp;Edytuj</a></td>
+                </tr>
+            }
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <th style="border-bottom-left-radius: 4px;">Data zakupów</th>
+            <th>Kwota</th>
+            <th>Ilość pozycji</th>
+            <th style="border-bottom-right-radius: 4px;" data-no-filter="true"></th>
+        </tr>
+    </tfoot>
+</table>

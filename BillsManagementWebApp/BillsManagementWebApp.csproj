@@ -242,6 +242,7 @@
     <Compile Include="Shared\PasswordHasher.cs" />
     <Compile Include="Shared\SessionManager.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="ViewModels\BillEntryViewModel.cs" />
     <Compile Include="ViewModels\BillViewModel.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
     <Compile Include="ViewModels\UserViewModel.cs" />
@@ -657,6 +658,8 @@
     <Content Include="Assets\js\icheck-1.x\skins\square\yellow.png" />
     <Content Include="Assets\js\icheck-1.x\skins\square\_all.css" />
     <Content Include="Assets\js\jQuery-3-2-0\jQuery-3-2-0.js" />
+    <Content Include="Assets\js\jQuery-DataTable-1.10.15\DataTable.min.js" />
+    <Content Include="Assets\js\jQuery-DataTable-1.10.15\styles.css" />
     <Content Include="Assets\js\js-custom-validation-lib\js-custom-validation-lib.js" />
     <Content Include="Assets\js\moment-develop\.gitattributes" />
     <Content Include="Assets\js\moment-develop\.gitignore" />
@@ -1390,6 +1393,7 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Shared\_CreateBillPartialView.cshtml" />
+    <Content Include="Views\Shared\_BillsListPartialView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201704201936256_ShopModel.resx">
