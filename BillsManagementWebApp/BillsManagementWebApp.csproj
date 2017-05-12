@@ -223,6 +223,10 @@
     <Compile Include="Migrations\201704231521499_Shop.Designer.cs">
       <DependentUpon>201704231521499_Shop.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201705121942197_ProductCategory_NewProp_UserOwnerId.cs" />
+    <Compile Include="Migrations\201705121942197_ProductCategory_NewProp_UserOwnerId.Designer.cs">
+      <DependentUpon>201705121942197_ProductCategory_NewProp_UserOwnerId.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Shop.cs" />
     <Compile Include="Shared\LoggedInUserAttribute.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -1401,6 +1405,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201704231521499_Shop.resx">
       <DependentUpon>201704231521499_Shop.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705121942197_ProductCategory_NewProp_UserOwnerId.resx">
+      <DependentUpon>201705121942197_ProductCategory_NewProp_UserOwnerId.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

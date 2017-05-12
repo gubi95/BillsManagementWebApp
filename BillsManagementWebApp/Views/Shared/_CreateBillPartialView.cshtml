@@ -1,10 +1,16 @@
 ﻿@using BillsManagementWebApp.ViewModels
 @using BillsManagementWebApp.Models
+@using BillsManagementWebApp.Shared
 @model BillViewModel
 
 @{
+    int nCurrentUserID = SessionManager.GetCurrentUser().UserID;
     ApplicationDBContext objApplicationDBContext = new ApplicationDBContext();
-    List<ProductCategory> listProductCategory = objApplicationDBContext.ProductCategories.ToList();
+    List<ProductCategory> listProductCategory = objApplicationDBContext
+        .ProductCategories
+        .Where(x => x.UserOwnerId == nCurrentUserID)                        
+        .ToList();
+
     string strProductCategoryDropdown = "<select class=\"select-product-category selectpicker\" data-live-search=\"true\">";
     foreach (ProductCategory objProductCategory in listProductCategory)
     {
@@ -263,8 +269,7 @@
         <div class="col-md-3">
             <input type="text" class="form-control" id="txtNewShopName" style="display: none;" />
             <select class="selectpicker" id="ddlShopSelector" data-live-search="true">
-                @{
-                    int nCurrentUserID = BillsManagementWebApp.Shared.SessionManager.GetCurrentUser().UserID;
+                @{                      
                     List<Shop> listShop = objApplicationDBContext
                         .Shops
                         .Include("UserOwner")

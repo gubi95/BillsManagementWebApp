@@ -64,10 +64,13 @@ namespace BillsManagementWebApp.WebAPI
 
         [HttpGet]
         [ActionName("getall")]
-        public ProductcategoryReturnEntityWrapper GetAll()
+        public ProductcategoryReturnEntityWrapper GetAll(int UserID)
         {
             ApplicationDBContext objApplicationDBContext = new ApplicationDBContext();
-            List<ProductCategory> listProductCategory = objApplicationDBContext.ProductCategories.ToList();
+            List<ProductCategory> listProductCategory = objApplicationDBContext
+                .ProductCategories
+                .Where(x => x.UserOwnerId == UserID)
+                .ToList();
 
             List<ProductCategoryApiWrapper> listProductCategoryApiWrapper = new List<ProductCategoryApiWrapper>();
 
