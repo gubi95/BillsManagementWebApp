@@ -14,9 +14,7 @@ namespace BillsManagementWebApp.Controllers
         [HttpGet]
         public ActionResult Index()
         {
-            UserViewModel objUserViewModel = new UserViewModel();
-            objUserViewModel.ApplyFromModel(SessionManager.GetCurrentUser());
-            return View(objUserViewModel);
+            return View(new UserViewModel(SessionManager.GetCurrentUser()));
         }
 
         [HttpPost]

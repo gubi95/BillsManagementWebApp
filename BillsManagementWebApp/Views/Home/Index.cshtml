@@ -115,7 +115,18 @@
     });
 
     function GoToCreateBill() {
+        // declaration on partial view
+        isBillCreationMode = true;
+        jQuery('#div-create-bill .div-selected-tab-content-header').html('Tworzenie paragonu');
         ShowNewSelectedTabContent('#div-create-bill');        
+    }
+
+    function GoToEditBill(billID) {
+        // declaration on partial view
+        isBillCreationMode = false;
+        jQuery('#div-create-bill .div-selected-tab-content-header').html('Edycja paragonu');
+        FillCreateBillFormForEdit(billID);
+        ShowNewSelectedTabContent('#div-create-bill');
     }
 
     function GoToBillsList() {

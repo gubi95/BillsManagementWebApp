@@ -32,6 +32,7 @@ namespace BillsManagementWebApp.Controllers
             Models.User objUser = objApplicationDBContext
                                     .Users
                                     .Include("Bills")
+                                    .Include("Bills.Shop")
                                     .Include("Bills.Entries")
                                     .Include("Bills.Entries.Category")
                                     .Where(x => x.Username.Equals(strUsername))

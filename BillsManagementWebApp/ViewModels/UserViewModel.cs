@@ -23,6 +23,13 @@ namespace BillsManagementWebApp.ViewModels
             }
         }
 
+        public UserViewModel() { }
+
+        public UserViewModel(User objUser)
+        {
+            this.ApplyFromModel(objUser);
+        }
+
         public void ApplyFromModel(User objUser)
         {
             this.Username = objUser.Username;

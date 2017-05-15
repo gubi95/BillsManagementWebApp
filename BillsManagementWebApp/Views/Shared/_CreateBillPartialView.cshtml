@@ -21,9 +21,11 @@
 
 <script>
     var createBillFormValidator = null;
+    var isBillCreationMode = true;
+    var currentEditedBillID = -1;
 
     jQuery(document).ready(function () {
-        createBillFormValidator = new Validator('#formCreateBill');         
+        createBillFormValidator = new Validator('#formCreateBill');
 
         jQuery('#dtPurchaseDate').datetimepicker({
             useCurrent: true,
@@ -52,7 +54,7 @@
             max: 1000000.00,
             step: 0.01,
             decimals: 2,
-            initval: 1.00,            
+            initval: 1.00,
         });
 
         jQuery('#cbCreateNewShop').iCheck({
@@ -65,7 +67,7 @@
                 jQuery('#txtNewShopName')
                     .attr('data-validators', 'not-empty')
                     .show();
-                
+
             }
             else {
                 jQuery('#txtNewShopName').hide();
@@ -79,54 +81,54 @@
         jQuery('body').on('click', '.btn-remove-product-row', function () {
             jQuery(this).closest('.product-row').remove();
         });
-
-        function AddNewProductRow() {
-            var productRowHTML =
-                '<div class="row product-row" style="padding-bottom: 10px;">' +
-                    '<div class="col-md-4" style="padding-top: 4px; padding-left: 40px;">' +
-                        '<input type="text" class="form-control" data-validators="not-empty" />' +
-                    '</div>' +
-                    '<div class="col-md-2" style="padding-top: 4px;">' +
-                        '<input type="text" class="product-quantity-selector" style="border-top-left-radius: 4px; border-bottom-left-radius: 4px;" data-validators="not-empty,reg-exp" data-valid-reg-exp="^(?:\\d*((\\.)|(,))\\d{2}|\\d+)$">' +
-                    '</div>' +
-                    '<div class="col-md-2" style="padding-top: 4px;">' +
-                        '<input type="text" class="product-price-selector" style="border-top-left-radius: 4px; border-bottom-left-radius: 4px;" data-validators="not-empty,reg-exp" data-valid-reg-exp="^(?:\\d*((\\.)|(,))\\d{2}|\\d+)$">' +
-                    '</div>' +
-                    '<div class="col-md-3" style="padding-top: 4px;">' +
-                        '@Html.Raw(strProductCategoryDropdown)' +
-                    '</div>' +
-                    '<div class="col-md-1" style="padding-top: 4px;">' +
-                        '<a class="btn btn-default btn-md btn-remove-product-row"><i class="fa fa-times"></i></a>' +
-                    '</div>' +
-                '</div>';
-            jQuery(productRowHTML).insertAfter(jQuery('.product-row').last());
-
-            jQuery(jQuery('.product-price-selector').last()).TouchSpin({
-                verticalbuttons: true,
-                verticalupclass: 'glyphicon glyphicon-plus',
-                verticaldownclass: 'glyphicon glyphicon-minus',
-                min: 0.01,
-                max: 1000000.00,
-                step: 0.01,
-                decimals: 2,
-                initval: 1.00,
-                postfix: "zł"
-            });
-
-            jQuery(jQuery('.product-quantity-selector').last()).TouchSpin({
-                verticalbuttons: true,
-                verticalupclass: 'glyphicon glyphicon-plus',
-                verticaldownclass: 'glyphicon glyphicon-minus',
-                min: 0.01,
-                max: 1000000.00,
-                step: 0.01,
-                decimals: 2,
-                initval: 1.00,                
-            });
-
-            jQuery('.select-product-category').last().selectpicker();
-        }
     });
+
+    function AddNewProductRow() {
+        var productRowHTML =
+            '<div class="row product-row" style="padding-bottom: 10px;">' +
+                '<div class="col-md-4" style="padding-top: 4px; padding-left: 40px;">' +
+                    '<input type="text" class="form-control" data-validators="not-empty" />' +
+                '</div>' +
+                '<div class="col-md-2" style="padding-top: 4px;">' +
+                    '<input type="text" class="product-quantity-selector" style="border-top-left-radius: 4px; border-bottom-left-radius: 4px;" data-validators="not-empty,reg-exp" data-valid-reg-exp="^(?:\\d*((\\.)|(,))\\d{2}|\\d+)$">' +
+                '</div>' +
+                '<div class="col-md-2" style="padding-top: 4px;">' +
+                    '<input type="text" class="product-price-selector" style="border-top-left-radius: 4px; border-bottom-left-radius: 4px;" data-validators="not-empty,reg-exp" data-valid-reg-exp="^(?:\\d*((\\.)|(,))\\d{2}|\\d+)$">' +
+                '</div>' +
+                '<div class="col-md-3" style="padding-top: 4px;">' +
+                    '@Html.Raw(strProductCategoryDropdown)' +
+                '</div>' +
+                '<div class="col-md-1" style="padding-top: 4px;">' +
+                    '<a class="btn btn-default btn-md btn-remove-product-row"><i class="fa fa-times"></i></a>' +
+                '</div>' +
+            '</div>';
+        jQuery(productRowHTML).insertAfter(jQuery('.product-row').last());
+
+        jQuery(jQuery('.product-price-selector').last()).TouchSpin({
+            verticalbuttons: true,
+            verticalupclass: 'glyphicon glyphicon-plus',
+            verticaldownclass: 'glyphicon glyphicon-minus',
+            min: 0.01,
+            max: 1000000.00,
+            step: 0.01,
+            decimals: 2,
+            initval: 1.00,
+            postfix: "zł"
+        });
+
+        jQuery(jQuery('.product-quantity-selector').last()).TouchSpin({
+            verticalbuttons: true,
+            verticalupclass: 'glyphicon glyphicon-plus',
+            verticaldownclass: 'glyphicon glyphicon-minus',
+            min: 0.01,
+            max: 1000000.00,
+            step: 0.01,
+            decimals: 2,
+            initval: 1.00,
+        });
+
+        jQuery('.select-product-category').last().selectpicker();
+    }
 
     function SaveNewBill() {
         if (!createBillFormValidator.validate(true)) {
@@ -139,18 +141,20 @@
                 StoreName: jQuery('#txtNewShopName').val().trim()
             } :
             {
-                StoreID: jQuery('#ddlShopSelector').selectpicker('val') * 1,  
+                StoreID: jQuery('#ddlShopSelector').selectpicker('val') * 1,
                 StoreName: ''
             };
 
         var arrProducts = [];
         jQuery('.product-row').each(function () {
+            var productID = jQuery(this).attr('pid') != undefined ? jQuery(this).attr('pid') * 1 : -1;
             var productName = jQuery(this).find('input[type="text"]').eq(0).val();
             var productQuantity = jQuery(this).find('.product-quantity-selector').val() * 1.00;
             var productPrice = jQuery(this).find('.product-price-selector').val() * 1.00;
             var productCategoryID = jQuery(this).find('.select-product-category').selectpicker('val') * 1;
 
             arrProducts.push({
+                ProductID: isBillCreationMode ? -1 : productID,
                 ProductName: productName,
                 Quantity: productQuantity,
                 Price: productPrice,
@@ -159,6 +163,7 @@
         });
 
         var objBill = {
+            BillID: isBillCreationMode ? -1 : currentEditedBillID,
             PurchaseDate: FormatJSDateToCSharpDate(jQuery('#dtPurchaseDate').data("DateTimePicker").date()._d),
             Store: objStore,
             Products: arrProducts
@@ -166,23 +171,45 @@
 
         jQuery.ajax({
             type: 'POST',
-            url: '/Handlers/BillHandler.ashx?Action=Create',
+            url: '/Handlers/BillHandler.ashx?Action=' + (isBillCreationMode ? 'Create' : 'Edit'),
             contentType: 'application/json',
             data: JSON.stringify(objBill),
             beforeSend: function() {
                 ShowHideAjaxWheel(true);
             },
             success: function (data) {
-                setTimeout(function () {
+                setTimeout(function (data) {
                     ShowHideAjaxWheel(false);
                     if (data.Success) {
-                        ShowAlertSuccess('Paragon został dodany!', 4000);
-                        ResetCreateBillForm();
+                        ShowAlertSuccess(isBillCreationMode ? 'Paragon został dodany!' : 'Paragon został zaktualizowany', 4000);
+
+                        // table is in _BillsListPartialView
+                        var table = jQuery("#tableBillsList").DataTable();
+                        var rowData = [];
+
+                        if (isBillCreationMode) {
+                            ResetCreateBillForm();                            
+                            rowData.push(FormatJSDateToString(jQuery('#dtPurchaseDate').data('DateTimePicker').date()._d));
+                            rowData.push(data.NewPriceFormatted);
+                            rowData.push(data.NewProductsCount);
+                            rowData.push('<a class="btn btn-default btn-sm" onclick="GoToEditBill(' + data.Bill.BillID + ');"><i class="fa fa-pencil"></i>&nbsp;Edytuj</a>');
+                            var newTableRow = table.row.add(rowData).draw().node();
+                            jQuery(newTableRow).attr('id', 'bill-row-' + data.Bill.BillID);
+                        }
+                        else {
+                            var rowSelector = '#bill-row-' + data.Bill.BillID;
+                            var row = table.row(rowSelector);
+                            rowData = row.data();
+                            rowData[0] = FormatJSDateToString(jQuery('#dtPurchaseDate').data('DateTimePicker').date()._d);
+                            rowData[1] = data.NewPriceFormatted;
+                            rowData[2] = data.NewProductsCount;
+                            row.data(rowData);
+                        }
                     }
                     else {
                         ShowAlertError('Coś poszło nie tak, prosze spróbować ponownie.', 4000);
                     }
-                }, 500);
+                }, 500, data);
             },
             error: function () {
                 setTimeout(function () {
@@ -206,6 +233,50 @@
         jQuery('#formCreateBill .product-row .select-product-category').selectpicker('val',
             jQuery('#formCreateBill .product-row .select-product-category option').eq(0).attr('value')
         );
+    }
+
+    @* EDIT BILLS CODE *@
+    function FillCreateBillFormForEdit(billID) {
+        currentEditedBillID = billID;
+        ResetCreateBillForm();
+        jQuery.ajax({
+            type: 'GET',
+            url: '/Handlers/BillHandler.ashx?Action=Get&BillID=' + billID,
+            contentType: 'applcation/json',
+            beforeSend: function() {
+                ShowHideAjaxWheel(true);
+            },
+            success: function (data) {
+                console.log(data.Bill.PurchaseDate);
+                jQuery('#dtPurchaseDate').data("DateTimePicker").date(new Date(data.Bill.PurchaseDate));
+                jQuery('#cbCreateNewShop').iCheck('uncheck');
+                jQuery('#formCreateBill #ddlShopSelector').selectpicker('val', data.Bill.Shop.ShopID);
+                if (data.Success) {
+                    // first row exists always so create rows only for entries in rage: 1 to n
+                    if (data.Bill.Entries.length > 1) {
+                        for (var i = 1; i < data.Bill.Entries.length; i++) {
+                            AddNewProductRow();
+                        }
+                    }
+
+                    jQuery('#formCreateBill .product-row').each(function (index) {
+                        var $row = jQuery(this);
+                        var currEntry = data.Bill.Entries[index];
+                        $row.attr('pid', currEntry.BillEntryID);
+                        $row.find('input[type="text"]').eq(0).val(currEntry.ProductName);
+                        $row.find('.product-quantity-selector').val(currEntry.Quantity.toFixed(2));
+                        $row.find('.product-price-selector').val(currEntry.Price.toFixed(2));
+                        $row.find('.select-product-category').selectpicker('val', currEntry.Category.ProductCategoryID);
+                    });
+
+                }
+                ShowHideAjaxWheel(false);
+            },
+            error: function (e) {
+                currentEditedBillID = -1;
+                ShowHideAjaxWheel(false);
+            }
+        });
     }
 
 </script>
