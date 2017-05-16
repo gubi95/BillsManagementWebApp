@@ -112,6 +112,7 @@
         jQuery('body').on('click', '#tileSignOut', SignOut);
         jQuery('body').on('click', '#tileCreateBill', GoToCreateBill);
         jQuery('body').on('click', '#tileBillsList', GoToBillsList);
+        jQuery('body').on('click', '#tileBillsCharts', GoToBillsCharts);
     });
 
     function GoToCreateBill() {
@@ -131,6 +132,10 @@
 
     function GoToBillsList() {
         ShowNewSelectedTabContent('#div-bills-list');
+    }
+
+    function GoToBillsCharts() {
+        ShowNewSelectedTabContent('#div-bills-charts');
     }
 
     function SignOut() {        
@@ -171,7 +176,7 @@
             </div>
         </div>
 
-        <div class="tile">
+        <div id="tileBillsCharts" class="tile">
             <div class="tile-content">
                 <span class="tile-header">
                     Wydatki
@@ -224,6 +229,12 @@
             <h2 class="div-selected-tab-content-header">Paragony</h2>
             <hr />
             @Html.Partial("/Views/Shared/_BillsListPartialView.cshtml", Model.Bills)
+        </div>
+
+        <div id="div-bills-charts" class="div-selected-tab-content" style="display: none;">
+            <h2 class="div-selected-tab-content-header">Wydatki</h2>
+            <hr />
+            @Html.Partial("/Views/Shared/_BillsChartsPartialView.cshtml")
         </div>
     </div>
 </div>

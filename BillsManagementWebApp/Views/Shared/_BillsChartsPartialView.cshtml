@@ -1,0 +1,139 @@
+﻿<script>
+    var allowToChangePeriodDropdown = false;
+
+    jQuery(document).ready(function () {        
+        jQuery('#ddlChartsPeriod').selectpicker();
+        jQuery('#ddlChartsPeriod').on('change', function () {
+            ChangeBillsDateRange(jQuery(this).selectpicker('val'));
+        });
+
+        jQuery('#dtBillsRangeFrom').datetimepicker({
+            locale: 'pl',
+            format: 'DD.MM.YYYY',
+            ignoreReadonly: true
+        });
+
+        jQuery('#dtBillsRangeTo').datetimepicker({
+            locale: 'pl',
+            format: 'DD.MM.YYYY',
+            ignoreReadonly: true,
+            useCurrent: false //Important! See issue #1075
+        });
+
+        jQuery('#dtBillsRangeFrom').on('dp.change', function (e) {
+            jQuery('#dtBillsRangeTo').data('DateTimePicker').minDate(e.date);
+
+            if (allowToChangePeriodDropdown) {
+                jQuery('#ddlChartsPeriod').selectpicker('val', 'NONE');
+            }
+            allowToChangePeriodDropdown = true;            
+        });
+
+        jQuery('#dtBillsRangeTo').on('dp.change', function (e) {
+            jQuery('#dtBillsRangeFrom').data('DateTimePicker').maxDate(e.date);
+
+            if (allowToChangePeriodDropdown) {
+                jQuery('#ddlChartsPeriod').selectpicker('val', 'NONE');
+            }
+            allowToChangePeriodDropdown = true;
+        });
+    });
+
+    function ChangeBillsDateRange(ddlValue) {        
+        switch (ddlValue) {
+            case 'CM':
+                SetBillsDateRange_currentMonth();
+                break;
+            case 'LM':
+                SetBillsDateRange_lastMonth();
+                break;
+            case 'L30D':
+                SetBillsDateRange_last30Days();
+                break;
+            case 'CY':
+                SetBillsDateRange_currentYear();
+                break;
+            case 'LY':
+                SetBillsDateRange_lastYear();
+                break;
+        }
+    }
+
+    function SetBillsDateRange_currentMonth() {
+        var date = new Date();
+        var dtStart = new Date(date.getFullYear(), date.getMonth(), 1);
+        var dtEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59);
+        SetBillsDateRange(dtStart, dtEnd);
+    }
+
+    function SetBillsDateRange_lastMonth() {        
+        var dtStart = new Date();
+        dtStart.setDate(1);
+        dtStart.setMonth(dtStart.getMonth() - 1);
+        var dtEnd = new Date(dtStart.getFullYear(), dtStart.getMonth() + 1, 0, 23, 59, 59);
+        SetBillsDateRange(dtStart, dtEnd);
+    }
+
+    function SetBillsDateRange_last30Days() {
+        var dtEnd = new Date();
+        var dtStart = new Date();
+        dtStart.setDate(dtEnd.getDate() - 30);
+        SetBillsDateRange(dtStart, dtEnd);
+    }
+
+    function SetBillsDateRange_currentYear() {
+        var date = new Date();
+        var dtStart = new Date(date.getFullYear(), 0, 1);
+        var dtEnd = new Date(date.getFullYear(), 11, 31, 23, 59, 59);
+        SetBillsDateRange(dtStart, dtEnd);
+    }
+
+    function SetBillsDateRange_lastYear() {
+        var date = new Date();
+        var dtStart = new Date(date.getFullYear() - 1, 0, 1);
+        var dtEnd = new Date(date.getFullYear() - 1, 11, 31, 23, 59, 59);
+        SetBillsDateRange(dtStart, dtEnd);
+    }
+
+    function SetBillsDateRange(dtStart, dtEnd) {
+        allowToChangePeriodDropdown = false;
+        jQuery('#dtBillsRangeFrom').data('DateTimePicker').date(dtStart);
+        allowToChangePeriodDropdown = false;
+        jQuery('#dtBillsRangeTo').data('DateTimePicker').date(dtEnd);
+    }
+
+</script>
+
+
+<div class="row">
+    <div class="col-md-4">
+        <span class="custom-label" style="margin-right: 5px;">Okres:</span>    
+        <select id="ddlChartsPeriod">
+            <option value="NONE">---</option>
+            <option value="CM">Obecny miesiąc</option>
+            <option value="LM">Poprzedni miesiąc</option>
+            <option value="L30D">Ostatnie 30 dni</option>
+            <option value="CY">Obecny rok</option>
+            <option value="LY">Poprzedni rok</option>
+        </select>
+    </div>
+    <div class="col-md-2" style="text-align: right; padding-top: px;">
+        <span class="custom-label">Zakres:</span>
+    </div>
+    <div class="col-md-3">
+        <div class='input-group date' id='dtBillsRangeFrom'>
+            <input type='text' class="form-control" readonly="readonly" />
+            <span class="input-group-addon">
+                <span class="glyphicon glyphicon-calendar"></span>
+            </span>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class='input-group date' id='dtBillsRangeTo'>
+            <input type='text' class="form-control" readonly="readonly" />
+            <span class="input-group-addon">
+                <span class="glyphicon glyphicon-calendar"></span>
+            </span>
+        </div>
+    </div>
+</div>
