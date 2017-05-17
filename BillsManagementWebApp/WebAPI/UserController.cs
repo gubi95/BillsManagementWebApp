@@ -91,6 +91,8 @@ namespace BillsManagementWebApp.WebAPI
             }
         }
 
+        // http:nazwa strony../api/User/login
+
         [HttpPost]
         [ActionName("login")]
         public UserReturnEntityWrapper Login(UserApiWrapper objUserApiWrapper)

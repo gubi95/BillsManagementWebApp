@@ -24,6 +24,7 @@
             jQuery('#dtBillsRangeTo').data('DateTimePicker').minDate(e.date);
 
             if (allowToChangePeriodDropdown) {
+                CreateCategoryPieChart();
                 jQuery('#ddlChartsPeriod').selectpicker('val', 'NONE');
             }
             allowToChangePeriodDropdown = true;            
@@ -33,6 +34,7 @@
             jQuery('#dtBillsRangeFrom').data('DateTimePicker').maxDate(e.date);
 
             if (allowToChangePeriodDropdown) {
+                CreateCategoryPieChart();
                 jQuery('#ddlChartsPeriod').selectpicker('val', 'NONE');
             }
             allowToChangePeriodDropdown = true;
@@ -43,18 +45,23 @@
         switch (ddlValue) {
             case 'CM':
                 SetBillsDateRange_currentMonth();
+                CreateCategoryPieChart();
                 break;
             case 'LM':
                 SetBillsDateRange_lastMonth();
+                CreateCategoryPieChart();
                 break;
             case 'L30D':
                 SetBillsDateRange_last30Days();
+                CreateCategoryPieChart();
                 break;
             case 'CY':
                 SetBillsDateRange_currentYear();
+                CreateCategoryPieChart();
                 break;
             case 'LY':
                 SetBillsDateRange_lastYear();
+                CreateCategoryPieChart();
                 break;
         }
     }
@@ -102,10 +109,102 @@
         jQuery('#dtBillsRangeTo').data('DateTimePicker').date(dtEnd);
     }
 
+    function CreateCategoryPieChart() {
+        jQuery.ajax({
+            type: 'POST',
+            url: '/Handlers/ChartsDataHandler.ashx',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                From: FormatJSDateToCSharpDate(jQuery('#dtBillsRangeFrom').data('DateTimePicker').date()._d),
+                To: FormatJSDateToCSharpDate(jQuery('#dtBillsRangeTo').data('DateTimePicker').date()._d),
+                ChartType: 'CategoryPieChart'
+            }),
+            beforeSend: function() {
+                ShowHideAjaxWheel(true);
+            },
+            success: function (data) {
+                var chartData = [];   
+                for (var i = 0; i < data.length; i++) {
+                    chartData.push({
+                        name: data[i].CategoryName,
+                        y: data[i].Price
+                    });
+                }                
+                DrawCategoryPieChart(chartData);
+                ShowHideAjaxWheel(false);
+            },
+            error: function () {
+                ShowHideAjaxWheel(false);
+            }
+        });
+    }
+
+    var categoryPieChartTotalPrice = null;
+    function DrawCategoryPieChart(data) {            
+        categoryPieChartTotalPrice = 0;              
+        for (var i = 0; i < data.length; i++) {
+            categoryPieChartTotalPrice += data[i].y;
+        }
+
+        Highcharts.chart('categoryPieChartCanvas', {
+            chart: {
+                backgroundColor: 'rgba(255,255,255,0.25)',
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie',
+                events: {
+                    load: function () {
+                        jQuery('#categoryPieChartCanvas .highcharts-text-outline').attr('stroke-width', 0);
+                    },
+                    redraw: function () {
+                        jQuery('#categoryPieChartCanvas .highcharts-text-outline').attr('stroke-width', 0);
+                    }
+                }
+            },
+            credits: {
+                enabled: false
+            },
+            title: {
+                text: 'Wydatki na poszczególne kategorie',
+                style: {
+                    color: 'white',
+                    fontFamily: '\'Lato\', sans-serif',
+                    lineHeight: '28px',
+                    fontSize: '32px'
+                }
+            },
+            tooltip: {
+                pointFormat: '{point.y} zł / ' + categoryPieChartTotalPrice + ' zł <br/> <b>{point.percentage:.2f}%</b>'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        format: '{point.name}: {point.percentage:.2f} %',
+                        style: {
+                            color: 'white',
+                            fontFamily: '\'Lato\', sans-serif',
+                            lineHeight: '18px',
+                            fontSize: '17px'
+                        }
+                    }
+                }
+            },
+            series: [{
+                name: null,
+                colorByPoint: true,
+                data: data
+            }]
+        });
+    }
+
 </script>
 
 
-<div class="row">
+<div class="row" style="padding-bottom: 20px;">
     <div class="col-md-4">
         <span class="custom-label" style="margin-right: 5px;">Okres:</span>    
         <select id="ddlChartsPeriod">
@@ -117,7 +216,7 @@
             <option value="LY">Poprzedni rok</option>
         </select>
     </div>
-    <div class="col-md-2" style="text-align: right; padding-top: px;">
+    <div class="col-md-2" style="text-align: right; padding-top: 5px;">
         <span class="custom-label">Zakres:</span>
     </div>
     <div class="col-md-3">
@@ -137,3 +236,5 @@
         </div>
     </div>
 </div>
+
+<div id="categoryPieChartCanvas" style="width: 100%; height: 400px; margin: 0 auto"></div>

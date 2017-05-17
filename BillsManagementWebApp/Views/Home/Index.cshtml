@@ -136,6 +136,10 @@
 
     function GoToBillsCharts() {
         ShowNewSelectedTabContent('#div-bills-charts');
+        setTimeout(function () {
+            SetBillsDateRange_currentMonth();
+            CreateCategoryPieChart();
+        }, 100);
     }
 
     function SignOut() {        
@@ -187,8 +191,8 @@
 
         <div class="tile">
             <div class="tile-content">
-                <span class="tile-header" style="font-size: 34px;">
-                    Lista<br/>zakupowa
+                <span class="tile-header">
+                    Kategorie
                 </span>
                 <i class="tile-icon glyphicon glyphicon-list-alt" style="top: 60px;"></i>
             </div>
