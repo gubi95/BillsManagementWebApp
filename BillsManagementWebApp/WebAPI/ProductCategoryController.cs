@@ -47,18 +47,24 @@ namespace BillsManagementWebApp.WebAPI
         {
             public int ProductCategoryID { get; set; }
             public string Name { get; set; }
+            public string Color { get; set; }
+            public decimal MonthBudget { get; set; }
 
             public ProductCategoryApiWrapper() { }
             public ProductCategoryApiWrapper(ProductCategory objProductCategory)
             {
                 this.ProductCategoryID = objProductCategory.ProductCategoryID;
                 this.Name = objProductCategory.Name;
+                this.Color = objProductCategory.Color;
+                this.MonthBudget = objProductCategory.MonthBudget;
             }
 
             public void FillModel(ref ProductCategory objProductCategory)
             {
                 objProductCategory.ProductCategoryID = this.ProductCategoryID;
                 objProductCategory.Name = this.Name;
+                objProductCategory.Color = this.Color;
+                objProductCategory.MonthBudget = this.MonthBudget;
             }
         }
 

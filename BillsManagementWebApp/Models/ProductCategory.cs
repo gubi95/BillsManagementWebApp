@@ -16,6 +16,10 @@ namespace BillsManagementWebApp.Models
         [MaxLength(100)]
         public string Name { get; set; }
 
+        public string Color { get; set; }
+
+        public decimal MonthBudget { get; set; }
+
         [Required]
         public int UserOwnerId { get; set; }
 
