@@ -1628,6 +1628,7 @@
     <Content Include="Views\Shared\_CreateBillPartialView.cshtml" />
     <Content Include="Views\Shared\_BillsListPartialView.cshtml" />
     <Content Include="Views\Shared\_BillsChartsPartialView.cshtml" />
+    <Content Include="Views\Shared\_ProductCategoriesPartialView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201704201936256_ShopModel.resx">

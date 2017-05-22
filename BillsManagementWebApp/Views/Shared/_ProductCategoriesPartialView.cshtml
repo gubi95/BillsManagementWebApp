@@ -1,0 +1,111 @@
+﻿<script>                     
+    var htmlCategoryRowTemplate =
+                    '<div class="row product-category-row">' +
+                        '<div class="col-md-4">' +
+                            '<input type="text" class="form-control" value="{value-name}" />' +
+                        '</div>' +
+                        '<div class="col-md-4">' +
+                            '<input type="text" class="form-control" value="{value-color}" />' +
+                        '</div>' +
+                        '<div class="col-md-3">' +
+                            '<input type="text" class="form-control product-category-budget-input" value="{value-month-budget}" />' +
+                        '</div>' +
+                        '<div class="col-md-1">' +
+                            '<a class="btn btn-default btn-md" onclick="DeleteProductCategoryRow(this); return false;"><i class="fa fa-times"></i></a>' +
+                        '</div>' +
+                    '</div>';
+
+    jQuery(document).ready(function () {
+        jQuery('#btn-add-product-category-row').on('click', AddNewProductCategoryRow);
+    });
+
+    function GetAllProductCategories() {
+        jQuery.ajax({
+            type: 'GET',
+            url: '/api/ProductCategory/GetAll?UserID=@BillsManagementWebApp.Shared.SessionManager.GetCurrentUser().UserID',
+            contentType: 'application/json',
+            beforeSend: function () {
+                ShowHideAjaxWheel(true);
+            },
+            success: function (data) {
+                jQuery('.product-category-row').remove();
+                if (data.ReturnCode == 0) {
+                    var categories = data.Categories;
+                    var totalCategoriesHtml = '';
+                    for (var i = 0; i < categories.length; i++) {
+                        var categoryHtml = htmlCategoryRowTemplate
+                                            .replace('{value-name}', categories[i].Name)
+                                            .replace('{value-color}', categories[i].Color)
+                                            .replace('{value-month-budget}', categories[i].MonthBudget.toFixed(2));
+                        totalCategoriesHtml += categoryHtml;
+                    }                                                                       
+                    jQuery(totalCategoriesHtml).insertAfter(jQuery('#productCategoriesHeader'));
+
+                    jQuery('.product-category-budget-input').TouchSpin({
+                        verticalbuttons: true,
+                        verticalupclass: 'glyphicon glyphicon-plus',
+                        verticaldownclass: 'glyphicon glyphicon-minus',
+                        min: 0.00,
+                        max: 1000000.00,
+                        step: 0.01,
+                        decimals: 2,
+                        initval: 0.00,
+                        postfix: "zł"
+                    });
+                }                                    
+                ShowHideAjaxWheel(false);
+            },
+            error: function () {
+                ShowHideAjaxWheel(false);
+            }
+        });
+    }
+
+    function AddNewProductCategoryRow() {
+        var newCategoryHtml = htmlCategoryRowTemplate
+                                .replace('{value-name}', '')
+                                .replace('{value-color}', '')
+                                .replace('{value-month-budget}', '');
+        jQuery(newCategoryHtml).insertBefore(jQuery('#productCategoriesFooter'));
+    }
+
+    function DeleteProductCategoryRow($btnDelete) {
+        $btnDelete.closest('.product-category-row').remove();
+    }
+
+</script>
+
+<style>
+    .product-category-row {
+        padding-bottom: 10px;
+    }
+
+    .product-category-budget-input {
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+    }
+</style>
+
+<div id="productCategories">    
+    <div id="productCategoriesHeader" class="row" style="padding-bottom: 5px;">
+        <div class="col-md-4">
+            <span class="custom-label">Nazwa:</span>
+        </div>
+        <div class="col-md-4">
+            <span class="custom-label">Kolor:</span>
+        </div>
+        <div class="col-md-3">
+            <span class="custom-label">Miesięczny budżet:</span>
+        </div>
+        <div class="col-md-1">
+            <span class="custom-label">Usuń:</span>
+        </div>
+    </div>
+
+    <div id="productCategoriesFooter" class="row">
+        <div class="col-md-12" style="padding-right: 53px;">
+            <a id="btn-add-product-category-row" class="btn btn-default btn-lg btn-transparent">Dodaj kategorie</a>
+            <a class="btn btn-default btn-lg btn-transparent" style="float: right;" onclick="SaveProductCategories(); return false;">Zapisz</a>
+        </div>
+    </div>
+</div>                                                                                             

@@ -113,6 +113,7 @@
         jQuery('body').on('click', '#tileCreateBill', GoToCreateBill);
         jQuery('body').on('click', '#tileBillsList', GoToBillsList);
         jQuery('body').on('click', '#tileBillsCharts', GoToBillsCharts);
+        jQuery('body').on('click', '#tileProductCategories', GoToProductCategories);
     });
 
     function GoToCreateBill() {
@@ -140,6 +141,12 @@
             SetBillsDateRange_currentMonth();
             CreateCategoryPieChart();
         }, 100);
+    }
+
+    function GoToProductCategories() {
+        // defined in _ProductCategoriesPartialView.cshtml
+        GetAllProductCategories();
+        ShowNewSelectedTabContent('#div-product-categories');
     }
 
     function SignOut() {        
@@ -189,7 +196,7 @@
             </div>
         </div>
 
-        <div class="tile">
+        <div id="tileProductCategories" class="tile">
             <div class="tile-content">
                 <span class="tile-header">
                     Kategorie
@@ -239,6 +246,12 @@
             <h2 class="div-selected-tab-content-header">Wydatki</h2>
             <hr />
             @Html.Partial("/Views/Shared/_BillsChartsPartialView.cshtml")
+        </div>
+
+        <div id="div-product-categories" class="div-selected-tab-content" style="display: none;">
+            <h2 class="div-selected-tab-content-header">Kategorie produktów</h2>
+            <hr />
+            @Html.Partial("/Views/Shared/_ProductCategoriesPartialView.cshtml")
         </div>
     </div>
 </div>
