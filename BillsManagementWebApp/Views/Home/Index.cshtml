@@ -120,6 +120,8 @@
         // declaration on partial view
         isBillCreationMode = true;
         jQuery('#div-create-bill .div-selected-tab-content-header').html('Tworzenie paragonu');
+        jQuery('#btn-delete-bill').hide();
+        SetProductCategoriesForBillEntries();
         ShowNewSelectedTabContent('#div-create-bill');        
     }
 
@@ -127,7 +129,7 @@
         // declaration on partial view
         isBillCreationMode = false;
         jQuery('#div-create-bill .div-selected-tab-content-header').html('Edycja paragonu');
-        FillCreateBillFormForEdit(billID);
+        SetProductCategoriesForBillEntries(billID);
         ShowNewSelectedTabContent('#div-create-bill');
     }
 
@@ -222,11 +224,22 @@
             </span>            
             <hr class="animate-start-stat-text" style="width: 80%; margin: 0 auto; margin-top: 20px; margin-bottom: 20px; border-width: 2px; opacity: 0;" />                        
             <span class="animate-start-stat-text" style="font-size: 45px; font-family: Abel; opacity: 0;">
-                Liczba paragonów: 23
+                Liczba paragonów: @(Model.Bills.Count)
             </span>
             <br />
             <span class="animate-start-stat-text" style="font-size: 45px; font-family: Abel; opacity: 0;">
-                Wydatki w tym miesiącu: 1354,67 zł
+                @{
+                    DateTime dtNow = DateTime.Now;
+                    DateTime dtStart = new DateTime(dtNow.Year, dtNow.Month, dtNow.Day, 0, 0, 0);
+                    DateTime dtEndStart = new DateTime(dtNow.Year, dtNow.Month, DateTime.DaysInMonth(dtNow.Year, dtNow.Month), 23, 59, 59);
+
+                    string strCurrentMonthTotalBillsValue = Model
+                                                                .Bills
+                                                                .Where(x => x.PurchaseDate >= dtStart && x.PurchaseDate <= dtEndStart)
+                                                                .Sum(y => y.Entries.Sum(z => z.Price))
+                                                                .ToString("C", new System.Globalization.CultureInfo("pl-PL"));
+                }
+                Wydatki w tym miesiącu: @(strCurrentMonthTotalBillsValue)
             </span>
         </div>
 

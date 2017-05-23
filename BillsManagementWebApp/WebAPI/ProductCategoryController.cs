@@ -10,18 +10,21 @@ namespace BillsManagementWebApp.WebAPI
 {
     public class ProductCategoryController : ApiController
     {
-        public class ProductcategoryReturnEntityWrapper
+        public class ProductCategoryReturnEntityWrapper
         {
             public enum EnumReturnCodes
             {
-                OK = 0                
+                OK = 0,
+                WRONG_CATEGORY_NAME = 1,
+                WRONG_USER_ID = 2,
             }
 
             private EnumReturnCodes enumReturnCode = EnumReturnCodes.OK;
 
             public List<ProductCategoryApiWrapper> Categories { get; set; }
+            public List<int> NewIDsList { get; set; }
 
-            public ProductcategoryReturnEntityWrapper(EnumReturnCodes enumRetCode)
+            public ProductCategoryReturnEntityWrapper(EnumReturnCodes enumRetCode)
             {
                 this.enumReturnCode = enumRetCode;
             }
@@ -70,7 +73,7 @@ namespace BillsManagementWebApp.WebAPI
 
         [HttpGet]
         [ActionName("getall")]
-        public ProductcategoryReturnEntityWrapper GetAll(int UserID)
+        public ProductCategoryReturnEntityWrapper GetAll(int UserID)
         {
             ApplicationDBContext objApplicationDBContext = new ApplicationDBContext();
             List<ProductCategory> listProductCategory = objApplicationDBContext
@@ -85,7 +88,92 @@ namespace BillsManagementWebApp.WebAPI
                 listProductCategoryApiWrapper.Add(new ProductCategoryApiWrapper(objProductCategory));
             }
 
-            return new ProductcategoryReturnEntityWrapper(ProductcategoryReturnEntityWrapper.EnumReturnCodes.OK) { Categories = listProductCategoryApiWrapper };
+            return new ProductCategoryReturnEntityWrapper(ProductCategoryReturnEntityWrapper.EnumReturnCodes.OK) { Categories = listProductCategoryApiWrapper };
+        }
+
+        public class SaveAllPostDataWrapper
+        {            
+            public int UserID { get; set; }
+            public ProductCategoryApiWrapper[] ProductCategories { get; set; }
+        }
+
+        [HttpPost]
+        [ActionName("saveall")]
+        public ProductCategoryReturnEntityWrapper SaveAll(SaveAllPostDataWrapper objSaveAllPostDataWrapper)
+        {
+            ApplicationDBContext objApplicationDBContext = new ApplicationDBContext();
+
+            int UserID = 1;
+
+            List<ProductCategory> listProductCategory = objApplicationDBContext
+                                                            .ProductCategories
+                                                            .Where(x => x.UserOwnerId == UserID)
+                                                            .ToList();
+
+            User objUser = objApplicationDBContext
+                                    .Users
+                                    .Where(x => x.UserID == UserID)
+                                    .FirstOrDefault();
+
+            List<int> listID = objSaveAllPostDataWrapper.ProductCategories.Select(x => x.ProductCategoryID).ToList();
+            List<ProductCategory> listProductCategoryToDelete = listProductCategory.FindAll(x => listID.Contains(x.ProductCategoryID) == false);
+            List<int> listProductCategoriesToDeleteIDs = listProductCategoryToDelete.Select(x => x.ProductCategoryID).ToList();
+
+            // set null to BillEntry.Category
+            List<BillEntry> listBillEntriesToNullifyCategory = objApplicationDBContext
+                .BillEntries
+                .Include("Category")
+                .Where(x => x.Category != null && listProductCategoriesToDeleteIDs.Contains(x.Category.ProductCategoryID))
+                .ToList();
+
+            for (int i = 0; i < listBillEntriesToNullifyCategory.Count; i++)
+            {
+                listBillEntriesToNullifyCategory[i].Category = null;
+            }
+            objApplicationDBContext.SaveChanges();
+
+
+            List<ProductCategory> listProductCategoryNew = new List<ProductCategory>();
+
+
+            foreach (ProductCategory objProductCategoryToDelete in listProductCategoryToDelete)
+            {
+                objApplicationDBContext.ProductCategories.Remove(objProductCategoryToDelete);
+            }
+
+            if (objUser == null)
+            {
+                return new ProductCategoryReturnEntityWrapper(ProductCategoryReturnEntityWrapper.EnumReturnCodes.WRONG_USER_ID);   
+            }
+
+            foreach (ProductCategoryApiWrapper objProductCategoryApiWrapper in objSaveAllPostDataWrapper.ProductCategories)
+            {
+                if (("" + objProductCategoryApiWrapper.Name).Trim() == "")
+                {
+                    return new ProductCategoryReturnEntityWrapper(ProductCategoryReturnEntityWrapper.EnumReturnCodes.WRONG_CATEGORY_NAME);
+                }
+
+                ProductCategory objProductCategory = listProductCategory.Find(x => x.ProductCategoryID == objProductCategoryApiWrapper.ProductCategoryID);
+
+                if (objProductCategory == null)
+                {
+                    ProductCategory objProductCategoryNew = new ProductCategory();
+                    objProductCategoryApiWrapper.FillModel(ref objProductCategoryNew);
+                    objProductCategoryNew.ProductCategoryID = 0;
+                    objProductCategoryNew.UserOwner = objUser;
+                    objProductCategoryNew.UserOwnerId = objUser.UserID;
+                    listProductCategoryNew.Add(objProductCategoryNew);                    
+                }
+                else
+                {
+                    objProductCategoryApiWrapper.FillModel(ref objProductCategory);
+                }
+            }
+
+            objApplicationDBContext.ProductCategories.AddRange(listProductCategoryNew);
+
+            objApplicationDBContext.SaveChanges();
+            return new ProductCategoryReturnEntityWrapper(ProductCategoryReturnEntityWrapper.EnumReturnCodes.OK) { NewIDsList = listProductCategoryNew.Select(x => x.ProductCategoryID).ToList() };
         }
     }
 }

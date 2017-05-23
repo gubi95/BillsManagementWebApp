@@ -67,7 +67,10 @@ namespace BillsManagementWebApp.WebAPI
                 this.ProductName = objBillEntry.ProductName;
                 this.Price = objBillEntry.Price;
                 this.Quantity = objBillEntry.Quantity;
-                this.Category = new ProductCategoryController.ProductCategoryApiWrapper(objBillEntry.Category);
+                if (objBillEntry.Category != null)
+                {
+                    this.Category = new ProductCategoryController.ProductCategoryApiWrapper(objBillEntry.Category);
+                }                
             }
 
             public void FillModel(ref BillEntry objBillEntry)

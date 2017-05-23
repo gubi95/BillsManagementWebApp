@@ -25,11 +25,13 @@ namespace BillsManagementWebApp.Handlers
         private class CategoryPieChartSeries
         {
             public string CategoryName { get; set; }
+            public string CategoryColor { get; set; }
             public decimal Price { get; set; }
 
             public CategoryPieChartSeries(ProductCategoryToTotalPrice objProductCategoryToTotalPrice)
             {
                 this.CategoryName = objProductCategoryToTotalPrice.Category.Name;
+                this.CategoryColor = objProductCategoryToTotalPrice.Category.Color;
                 this.Price = objProductCategoryToTotalPrice.Price;
             }
         }
@@ -78,7 +80,10 @@ namespace BillsManagementWebApp.Handlers
                             }
                             else
                             {
-                                listProductCategoryToTotalPrice.Add(new ProductCategoryToTotalPrice() { Category = objBillEntry.Category, Price = objBillEntry.Price });
+                                listProductCategoryToTotalPrice.Add(new ProductCategoryToTotalPrice()
+                                {
+                                    Category = objBillEntry.Category != null ? objBillEntry.Category : Constants.GetDefaultProductCategory(),
+                                    Price = objBillEntry.Price });
                             }
                         }
                     }

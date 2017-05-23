@@ -3,26 +3,15 @@
 @using BillsManagementWebApp.Shared
 @model BillViewModel
 
-@{
+@{    
     int nCurrentUserID = SessionManager.GetCurrentUser().UserID;
-    ApplicationDBContext objApplicationDBContext = new ApplicationDBContext();
-    List<ProductCategory> listProductCategory = objApplicationDBContext
-        .ProductCategories
-        .Where(x => x.UserOwnerId == nCurrentUserID)                        
-        .ToList();
-
-    string strProductCategoryDropdown = "<select class=\"select-product-category selectpicker\" data-live-search=\"true\">";
-    foreach (ProductCategory objProductCategory in listProductCategory)
-    {
-        strProductCategoryDropdown += "<option value=\"" + objProductCategory.ProductCategoryID + "\">" + objProductCategory.Name + "</option>";
-    }
-    strProductCategoryDropdown += "</select>";
 }
 
 <script>
     var createBillFormValidator = null;
     var isBillCreationMode = true;
     var currentEditedBillID = -1;
+    var currentCategoriesSelectHtml = '';
 
     jQuery(document).ready(function () {
         createBillFormValidator = new Validator('#formCreateBill');
@@ -66,6 +55,7 @@
                 jQuery('#ddlShopSelector').selectpicker('hide');
                 jQuery('#txtNewShopName')
                     .attr('data-validators', 'not-empty')
+                    .val('')
                     .show();
 
             }
@@ -83,6 +73,41 @@
         });
     });
 
+    function SetProductCategoriesForBillEntries(billID) {
+        var that = this;
+        jQuery.ajax({
+            type: 'GET',
+            url: '/api/ProductCategory/GetAll?UserID=@nCurrentUserID',
+            contentType: 'application/json',
+            beforeSend: function () {
+                ShowHideAjaxWheel(true);
+            },
+            success: function (data) {                
+                if (data.ReturnCode == 0) {
+                    currentCategoriesSelectHtml = '<select class="select-product-category selectpicker" data-live-search="true">';
+                    currentCategoriesSelectHtml += '<option value="-1">Bez kategorii</option>';
+                    var firstCategorySelectHtml = '';
+                    var categories = data.Categories;
+                    for (var i = 0; i < categories.length; i++) {
+                        currentCategoriesSelectHtml += '<option value="' + categories[i].ProductCategoryID + '">' + categories[i].Name + '</option>';
+                        firstCategorySelectHtml += '<option value="' + categories[i].ProductCategoryID + '">' + categories[i].Name + '</option>';
+                    }
+                    jQuery('#firstProductCategorySelect').html('<option value="-1">Bez kategorii</option>' + firstCategorySelectHtml);
+                    jQuery('#firstProductCategorySelect').selectpicker('refresh');
+                    currentCategoriesSelectHtml += '</select>';
+
+                    if (billID != undefined) {                        
+                        FillCreateBillFormForEdit(billID);
+                    }
+                }
+                ShowHideAjaxWheel(false);
+            },
+            error: function () {
+                ShowHideAjaxWheel(false);
+            }
+        });
+    }
+
     function AddNewProductRow() {
         var productRowHTML =
             '<div class="row product-row" style="padding-bottom: 10px;">' +
@@ -96,7 +121,7 @@
                     '<input type="text" class="product-price-selector" style="border-top-left-radius: 4px; border-bottom-left-radius: 4px;" data-validators="not-empty,reg-exp" data-valid-reg-exp="^(?:\\d*((\\.)|(,))\\d{2}|\\d+)$">' +
                 '</div>' +
                 '<div class="col-md-3" style="padding-top: 4px;">' +
-                    '@Html.Raw(strProductCategoryDropdown)' +
+                    currentCategoriesSelectHtml +
                 '</div>' +
                 '<div class="col-md-1" style="padding-top: 4px;">' +
                     '<a class="btn btn-default btn-md btn-remove-product-row"><i class="fa fa-times"></i></a>' +
@@ -135,15 +160,24 @@
             return;
         }
 
-        var objStore = jQuery('#cbCreateNewShop').is(':checked') ?
-            {
+        var objStore = null;
+        var isNewShopCreated = jQuery('#cbCreateNewShop').is(':checked');
+
+        if(isNewShopCreated) {
+            objStore = {
                 StoreID: -1,
                 StoreName: jQuery('#txtNewShopName').val().trim()
-            } :
-            {
+            };
+        }
+        else {
+            if (jQuery('#ddlShopSelector').selectpicker('val') == '-1') {                
+                return;
+            }
+            objStore = {
                 StoreID: jQuery('#ddlShopSelector').selectpicker('val') * 1,
                 StoreName: ''
             };
+        }
 
         var arrProducts = [];
         jQuery('.product-row').each(function () {
@@ -183,6 +217,16 @@
                     if (data.Success) {
                         ShowAlertSuccess(isBillCreationMode ? 'Paragon został dodany!' : 'Paragon został zaktualizowany', 4000);
 
+                        if(isNewShopCreated) {
+                            jQuery('#ddlShopSelector')
+                                .find('option[value="-1"]')
+                                .remove();
+                            jQuery('#ddlShopSelector')
+                                .append('<option value="' + data.Bill.Shop.ShopID + '">' + data.Bill.Shop.ShopName + '</option>');
+                            jQuery('#ddlShopSelector')
+                                .selectpicker('refresh');
+                        }
+
                         // table is in _BillsListPartialView
                         var table = jQuery("#tableBillsList").DataTable();
                         var rowData = [];
@@ -191,6 +235,7 @@
                             ResetCreateBillForm();                            
                             rowData.push(FormatJSDateToString(jQuery('#dtPurchaseDate').data('DateTimePicker').date()._d));
                             rowData.push(data.NewPriceFormatted);
+                            rowData.push(data.NewShopName);
                             rowData.push(data.NewProductsCount);
                             rowData.push('<a class="btn btn-default btn-sm" onclick="GoToEditBill(' + data.Bill.BillID + ');"><i class="fa fa-pencil"></i>&nbsp;Edytuj</a>');
                             var newTableRow = table.row.add(rowData).draw().node();
@@ -202,7 +247,8 @@
                             rowData = row.data();
                             rowData[0] = FormatJSDateToString(jQuery('#dtPurchaseDate').data('DateTimePicker').date()._d);
                             rowData[1] = data.NewPriceFormatted;
-                            rowData[2] = data.NewProductsCount;
+                            rowData[2] = data.NewShopName;
+                            rowData[3] = data.NewProductsCount;
                             row.data(rowData);
                         }
                     }
@@ -246,8 +292,7 @@
             beforeSend: function() {
                 ShowHideAjaxWheel(true);
             },
-            success: function (data) {
-                console.log(data.Bill.PurchaseDate);
+            success: function (data) {                
                 jQuery('#dtPurchaseDate').data("DateTimePicker").date(new Date(data.Bill.PurchaseDate));
                 jQuery('#cbCreateNewShop').iCheck('uncheck');
                 jQuery('#formCreateBill #ddlShopSelector').selectpicker('val', data.Bill.Shop.ShopID);
@@ -266,14 +311,50 @@
                         $row.find('input[type="text"]').eq(0).val(currEntry.ProductName);
                         $row.find('.product-quantity-selector').val(currEntry.Quantity.toFixed(2));
                         $row.find('.product-price-selector').val(currEntry.Price.toFixed(2));
-                        $row.find('.select-product-category').selectpicker('val', currEntry.Category.ProductCategoryID);
+                        $row.find('.select-product-category').selectpicker('val', currEntry.Category != null ? currEntry.Category.ProductCategoryID : '-1');
                     });
+
+                    jQuery('#btn-delete-bill').show();
 
                 }
                 ShowHideAjaxWheel(false);
             },
             error: function (e) {
                 currentEditedBillID = -1;
+                ShowHideAjaxWheel(false);
+            }
+        });
+    }
+
+    function DeleteCurrentBill() {
+        jQuery.ajax({
+            type: 'POST',
+            url: '/Handlers/BillHandler.ashx?Action=Delete',
+            data: JSON.stringify({ BillID: currentEditedBillID }),
+            contentType: 'applcation/json',
+            beforeSend: function () {
+                ShowHideAjaxWheel(true);
+            },
+            success: function (data) {
+                if (data.Success) {
+                    ShowAlertSuccess('Paragon został usunięty!', 4000);
+                    ResetCreateBillForm();                    
+                    jQuery('#btn-delete-bill').hide();
+                    var table = jQuery("#tableBillsList").DataTable();
+                    var rowSelector = '#bill-row-' + currentEditedBillID;
+                    table.row(rowSelector).remove();
+                    table.draw();
+                    currentEditedBillID = -1;
+                    GoToBillsList();
+                }
+                else {
+                    ShowAlertSuccess('Coś poszło nie tak, proszę spróbować ponownie.', 4000);
+                }
+
+                ShowHideAjaxWheel(false);
+            },
+            error: function () {
+                ShowAlertSuccess('Coś poszło nie tak, proszę spróbować ponownie.', 4000);
                 ShowHideAjaxWheel(false);
             }
         });
@@ -341,7 +422,7 @@
             <input type="text" class="form-control" id="txtNewShopName" style="display: none;" />
             <select class="selectpicker" id="ddlShopSelector" data-live-search="true">
                 @{                      
-                    List<Shop> listShop = objApplicationDBContext
+                    List<Shop> listShop = new ApplicationDBContext()
                         .Shops
                         .Include("UserOwner")
                         .Where(x => x.UserOwner.UserID == nCurrentUserID)
@@ -388,17 +469,17 @@
             <input type="text" class="product-price-selector" style="border-top-left-radius: 4px; border-bottom-left-radius: 4px;" data-validators="not-empty,reg-exp" data-valid-reg-exp="^(?:\d*((\.)|(,))\d{2}|\d+)$">                      
         </div>        
         <div class="col-md-3" style="padding-top: 4px;">
-            @Html.Raw(strProductCategoryDropdown)
+            <select id="firstProductCategorySelect" class="select-product-category selectpicker" data-live-search="true"></select>
         </div>
         <div class="col-md-1">
             
         </div>
-    </div>
-    
+    </div>                                                                                                           
     <div class="row">
         <div class="col-md-12" style="padding-left: 40px; padding-right: 53px;">
             <a id="btn-add-product-row" class="btn btn-default btn-lg btn-transparent">Dodaj produkt</a>
             <a class="btn btn-default btn-lg btn-transparent" style="float: right;" onclick="SaveNewBill(); return false;">Zapisz</a>
+            <a id="btn-delete-bill" class="btn btn-default btn-lg btn-transparent" style="float: right; display: none; margin-right: 10px;" onclick="DeleteCurrentBill(); return false;">Usuń</a>
         </div>
     </div>
 </form> 

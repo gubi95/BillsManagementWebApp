@@ -218,21 +218,9 @@
     <Compile Include="Handlers\ChartsDataHandler.ashx.cs">
       <DependentUpon>ChartsDataHandler.ashx</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201704201936256_ShopModel.cs" />
-    <Compile Include="Migrations\201704201936256_ShopModel.Designer.cs">
-      <DependentUpon>201704201936256_ShopModel.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201704231521499_Shop.cs" />
-    <Compile Include="Migrations\201704231521499_Shop.Designer.cs">
-      <DependentUpon>201704231521499_Shop.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201705121942197_ProductCategory_NewProp_UserOwnerId.cs" />
-    <Compile Include="Migrations\201705121942197_ProductCategory_NewProp_UserOwnerId.Designer.cs">
-      <DependentUpon>201705121942197_ProductCategory_NewProp_UserOwnerId.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201705181746470_ProductCateogyr_NewFields_Color_MonthBudget.cs" />
-    <Compile Include="Migrations\201705181746470_ProductCateogyr_NewFields_Color_MonthBudget.Designer.cs">
-      <DependentUpon>201705181746470_ProductCateogyr_NewFields_Color_MonthBudget.cs</DependentUpon>
+    <Compile Include="Migrations\201705231818176_Reset.cs" />
+    <Compile Include="Migrations\201705231818176_Reset.Designer.cs">
+      <DependentUpon>201705231818176_Reset.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\Shop.cs" />
     <Compile Include="Shared\LoggedInUserAttribute.cs" />
@@ -256,6 +244,7 @@
     <Compile Include="ViewModels\BillEntryViewModel.cs" />
     <Compile Include="ViewModels\BillViewModel.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
+    <Compile Include="ViewModels\ShopViewModel.cs" />
     <Compile Include="ViewModels\UserViewModel.cs" />
     <Compile Include="WebAPI\BillController.cs" />
     <Compile Include="WebAPI\BillEntryController.cs" />
@@ -273,6 +262,25 @@
     <Content Include="Assets\js\bootstrap-3.3.7-dist\js\bootstrap.js" />
     <Content Include="Assets\js\bootstrap-3.3.7-dist\js\bootstrap.min.js" />
     <Content Include="Assets\js\bootstrap-3.3.7-dist\js\npm.js" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\.gitignore" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\dist\css\bootstrap-colorpicker.css" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\dist\css\bootstrap-colorpicker.min.css" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\dist\img\bootstrap-colorpicker\alpha-horizontal.png" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\dist\img\bootstrap-colorpicker\alpha.png" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\dist\img\bootstrap-colorpicker\hue-horizontal.png" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\dist\img\bootstrap-colorpicker\hue.png" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\dist\img\bootstrap-colorpicker\saturation.png" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\dist\js\bootstrap-colorpicker.js" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\dist\js\bootstrap-colorpicker.min.js" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\docs\assets\main.css" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\docs\helpers\code\index.js" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\Gruntfile.js" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\index.html" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\serve.js" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\src\js\colorpicker-color.js" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\src\js\colorpicker-component.js" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\src\js\colorpicker-defaults.js" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\src\js\colorpicker-plugin-wrapper.js" />
     <Content Include="Assets\js\bootstrap-datetimepicker-master\.gitattributes" />
     <Content Include="Assets\js\bootstrap-datetimepicker-master\.gitignore" />
     <Content Include="Assets\js\bootstrap-datetimepicker-master\build\css\bootstrap-datetimepicker-standalone.css" />
@@ -1617,6 +1625,36 @@
     <Content Include="Assets\js\Highcharts-5.0.11\code\modules\stock.js.map" />
     <Content Include="Assets\js\Highcharts-5.0.11\code\modules\treemap.js.map" />
     <Content Include="Assets\js\Highcharts-5.0.11\code\modules\xrange-series.js.map" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\.editorconfig" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\.jshintrc" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\.travis.yml" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\bower.json" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\composer.json" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\CONTRIBUTING.md" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\dist\css\bootstrap-colorpicker.css.map" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\dist\css\bootstrap-colorpicker.min.css.map" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\docs\includes\api.hbs" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\docs\includes\example.hbs" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\docs\includes\examples.hbs" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\docs\includes\examples\01_basic.hbs" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\docs\includes\examples\02_component.hbs" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\docs\includes\examples\03_component_options.hbs" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\docs\includes\examples\04_events.hbs" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\docs\includes\examples\05_transparent.hbs" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\docs\includes\examples\06_horizontal.hbs" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\docs\includes\examples\07_inline.hbs" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\docs\includes\examples\08_palette.hbs" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\docs\includes\examples\09_size.hbs" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\docs\includes\examples\10_disabled.hbs" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\docs\includes\examples\11_modal.hbs" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\docs\includes\social.hbs" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\docs\layout.hbs" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\docs\pages\index.hbs" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\LICENSE" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\package.json" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\README.md" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\src\less\colorpicker.less" />
+    <Content Include="Assets\js\bootstrap-colorpicker-master\src\sass\_colorpicker.scss" />
     <None Include="Project_Readme.html" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Login\Index.cshtml" />
@@ -1631,25 +1669,16 @@
     <Content Include="Views\Shared\_ProductCategoriesPartialView.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201704201936256_ShopModel.resx">
-      <DependentUpon>201704201936256_ShopModel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201704231521499_Shop.resx">
-      <DependentUpon>201704231521499_Shop.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201705121942197_ProductCategory_NewProp_UserOwnerId.resx">
-      <DependentUpon>201705121942197_ProductCategory_NewProp_UserOwnerId.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201705181746470_ProductCateogyr_NewFields_Color_MonthBudget.resx">
-      <DependentUpon>201705181746470_ProductCateogyr_NewFields_Color_MonthBudget.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
     <TypeScriptCompile Include="Assets\js\moment-develop\moment.d.ts" />
     <TypeScriptCompile Include="Assets\js\moment-develop\typing-tests\moment-tests.ts" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201705231818176_Reset.resx">
+      <DependentUpon>201705231818176_Reset.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

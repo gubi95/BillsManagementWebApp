@@ -1,22 +1,27 @@
 ﻿<script>                     
     var htmlCategoryRowTemplate =
-                    '<div class="row product-category-row">' +
+                    '<div class="row product-category-row" data-pid="{product-id}">' +
                         '<div class="col-md-4">' +
-                            '<input type="text" class="form-control" value="{value-name}" />' +
+                            '<input type="text" class="form-control" value="{value-name}" data-validators="not-empty" />' +
                         '</div>' +
                         '<div class="col-md-4">' +
-                            '<input type="text" class="form-control" value="{value-color}" />' +
+                            '<div class="input-group colorpicker-component product-category-color-input">' +
+                                '<input type="text" class="form-control" value="{value-color}" readonly="readonly" />' +
+                                '<span class="input-group-addon"><i></i></span>' +
+                            '</div>' +
                         '</div>' +
                         '<div class="col-md-3">' +
-                            '<input type="text" class="form-control product-category-budget-input" value="{value-month-budget}" />' +
+                            '<input type="text" class="form-control product-category-budget-input" value="{value-month-budget}" style="border-top-left-radius: 4px; border-bottom-left-radius: 4px;" />' +
                         '</div>' +
                         '<div class="col-md-1">' +
                             '<a class="btn btn-default btn-md" onclick="DeleteProductCategoryRow(this); return false;"><i class="fa fa-times"></i></a>' +
                         '</div>' +
                     '</div>';
 
+    var productCategoriesFormValidator = null;
     jQuery(document).ready(function () {
         jQuery('#btn-add-product-category-row').on('click', AddNewProductCategoryRow);
+        productCategoriesFormValidator = new Validator('#productCategories');
     });
 
     function GetAllProductCategories() {
@@ -34,6 +39,7 @@
                     var totalCategoriesHtml = '';
                     for (var i = 0; i < categories.length; i++) {
                         var categoryHtml = htmlCategoryRowTemplate
+                                            .replace('{product-id}', categories[i].ProductCategoryID)
                                             .replace('{value-name}', categories[i].Name)
                                             .replace('{value-color}', categories[i].Color)
                                             .replace('{value-month-budget}', categories[i].MonthBudget.toFixed(2));
@@ -52,6 +58,10 @@
                         initval: 0.00,
                         postfix: "zł"
                     });
+
+                    jQuery('.product-category-color-input').colorpicker({
+                        format: 'hex'
+                    });
                 }                                    
                 ShowHideAjaxWheel(false);
             },
@@ -63,14 +73,81 @@
 
     function AddNewProductCategoryRow() {
         var newCategoryHtml = htmlCategoryRowTemplate
+                                .replace('{product-id}', '-1')
                                 .replace('{value-name}', '')
-                                .replace('{value-color}', '')
-                                .replace('{value-month-budget}', '');
+                                .replace('{value-color}', '#000000')
+                                .replace('{value-month-budget}', '0.00');
         jQuery(newCategoryHtml).insertBefore(jQuery('#productCategoriesFooter'));
+
+        jQuery('.product-category-budget-input').last().TouchSpin({
+            verticalbuttons: true,
+            verticalupclass: 'glyphicon glyphicon-plus',
+            verticaldownclass: 'glyphicon glyphicon-minus',
+            min: 0.00,
+            max: 1000000.00,
+            step: 0.01,
+            decimals: 2,
+            initval: 0.00,
+            postfix: "zł"
+        });
+
+        jQuery('.product-category-color-input').last().colorpicker({
+            format: 'hex'
+        });
     }
 
     function DeleteProductCategoryRow($btnDelete) {
         $btnDelete.closest('.product-category-row').remove();
+    }
+
+    function SaveProductCategories() {
+        if (!productCategoriesFormValidator.validate(true)) {
+            return;
+        }
+
+        var arrProductCategories = [];
+
+        jQuery('.product-category-row').each(function () {
+            var $row = jQuery(this);                                           
+            var categoryID = $row.attr('data-pid') * 1;
+            var categoryName = $row.find('input[type="text"]').eq(0).val();
+            var categoryColor = $row.find('input[type="text"]').eq(1).val();
+            var categoryMonthBudget = $row.find('input[type="text"]').eq(2).val() * 1;
+
+            arrProductCategories.push({
+                ProductCategoryID: categoryID,
+                Name: categoryName,
+                Color: categoryColor,
+                MonthBudget: categoryMonthBudget
+            });
+        });
+
+        jQuery.ajax({
+            type: 'POST',
+            url: '/api/ProductCategory/SaveAll',
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            data: JSON.stringify({
+                UserID: @BillsManagementWebApp.Shared.SessionManager.GetCurrentUser().UserID,
+                ProductCategories: arrProductCategories
+            }),
+            beforeSend: function () {
+                ShowHideAjaxWheel(true);
+            },
+            success: function (data) {
+                if(data.ReturnCode == 0) {
+                    ShowAlertSuccess('Kategorie produktów zostały zapisane!', 4000);
+                    var i = 0;
+                    jQuery('div[class*="product-category-row"][data-pid="-1"]').each(function () {
+                        jQuery(this).attr('data-pid', data.NewIDsList[i++]);
+                    });
+                }
+                ShowHideAjaxWheel(false);
+            },
+            error: function () {
+                ShowHideAjaxWheel(false);
+            }
+        });
     }
 
 </script>

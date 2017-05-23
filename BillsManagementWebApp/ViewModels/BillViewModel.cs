@@ -10,6 +10,7 @@ namespace BillsManagementWebApp.ViewModels
         public int BillID { get; set; }  
         public DateTime PurchaseDate { get; set; }
         public List<BillEntryViewModel> Entries { get; set; }
+        public ShopViewModel Shop { get; set; }
 
         public BillViewModel() { }
 
@@ -28,6 +29,8 @@ namespace BillsManagementWebApp.ViewModels
             {
                 this.Entries = objBill.Entries.Select(x => new BillEntryViewModel(x)).ToList();
             }
+
+            this.Shop = new ShopViewModel(objBill.Shop);
         }
 
         public void ApplyToModel(ref BillsManagementWebApp.Models.Bill objBill)

@@ -26,6 +26,11 @@ namespace BillsManagementWebApp.Controllers
             objApplicationDBContext.Users.Add(objUser);
             objApplicationDBContext.SaveChanges();
 
+            objApplicationDBContext.ProductCategories.AddRange(Constants.GetPreDefinedCategories(objUser));
+            objApplicationDBContext.SaveChanges();
+
+            objUser.Bills = new List<Bill>();
+
             SessionManager.SetCurrentUser(objUser);
                                          
             return RedirectToAction("Index", "Home");

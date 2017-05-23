@@ -20,8 +20,7 @@ namespace BillsManagementWebApp.Models
 
         [Required]
         public double Quantity { get; set; }
-
-        [Required]        
+                        
         public ProductCategory Category { get; set; }
     }
 }

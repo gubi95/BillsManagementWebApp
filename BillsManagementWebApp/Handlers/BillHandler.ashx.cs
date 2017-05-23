@@ -43,6 +43,7 @@ namespace BillsManagementWebApp.Handlers
             public Bill Bill { get; set; }
             public string NewPriceFormatted { get; set; }
             public int NewProductsCount { get; set; }
+            public string NewShopName { get; set; }
         }
 
         public void ProcessRequest(HttpContext objHttpContext)
@@ -85,7 +86,7 @@ namespace BillsManagementWebApp.Handlers
 
                     Bill objBill = new Bill()
                     {
-                        PurchaseDate = objViewBill.PurchaseDate,                        
+                        PurchaseDate = objViewBill.PurchaseDate,
                         Entries = listBillEntry
                     };
 
@@ -104,7 +105,10 @@ namespace BillsManagementWebApp.Handlers
                     objBill.Shop.UserOwner = null;
                     for (int i = 0; i < objBill.Entries.Count; i++)
                     {
-                        objBill.Entries[i].Category.UserOwner = null;
+                        if (objBill.Entries[i].Category != null)
+                        {
+                            objBill.Entries[i].Category.UserOwner = null;
+                        }
                     }
 
                     objHttpContext.Response.ContentType = "application/json";
@@ -115,7 +119,8 @@ namespace BillsManagementWebApp.Handlers
                             Message = "OK",
                             Bill = objBill,
                             NewPriceFormatted = objBill.Entries.Sum(x => x.Price).ToString("C", new System.Globalization.CultureInfo("pl-PL")),
-                            NewProductsCount = objBill.Entries.Count
+                            NewProductsCount = objBill.Entries.Count,
+                            NewShopName = objBill.Shop.ShopName
                         }));
                 }
                 catch (Exception ex)
@@ -192,23 +197,63 @@ namespace BillsManagementWebApp.Handlers
                     objBill.Shop.UserOwner = null;
                     for (int i = 0; i < objBill.Entries.Count; i++)
                     {
-                        objBill.Entries[i].Category.UserOwner = null;
+                        if (objBill.Entries[i].Category != null)
+                        {
+                            objBill.Entries[i].Category.UserOwner = null;
+                        }
                     }
 
                     objHttpContext.Response.ContentType = "application/json";
                     objHttpContext.Response.Write(JsonConvert.SerializeObject(new Response()
                     {
                         Success = true,
-                        Message = "OK",    
-                        Bill = objBill,                    
+                        Message = "OK",
+                        Bill = objBill,
                         NewPriceFormatted = objBill.Entries.Sum(x => x.Price).ToString("C", new System.Globalization.CultureInfo("pl-PL")),
-                        NewProductsCount = objBill.Entries.Count
+                        NewProductsCount = objBill.Entries.Count,
+                        NewShopName = objBill.Shop.ShopName
                     }));
                 }
                 catch (Exception ex)
                 {
                     objHttpContext.Response.ContentType = "application/json";
                     objHttpContext.Response.Write(JsonConvert.SerializeObject(new Response() { Success = false, Message = ex.ToString() }));
+                }
+            }
+            else if (strAction.Equals("Delete"))
+            {
+                ViewBill objViewBill = JsonConvert.DeserializeObject<ViewBill>(strJSON);
+
+                User objUser = SessionManager.GetCurrentUser();
+                int nIndex = objUser.Bills.FindIndex(x => x.BillID == objViewBill.BillID);
+
+                objHttpContext.Response.ContentType = "application/json";
+
+                if (nIndex != -1)
+                {
+                    ApplicationDBContext objApplicationDBContext = new ApplicationDBContext();
+
+                    Bill objBillToDelete = objApplicationDBContext
+                                            .Bills
+                                            .Include("Entries")
+                                            .Where(x => x.BillID == objViewBill.BillID)
+                                            .FirstOrDefault();
+
+                    if (objBillToDelete != null)
+                    {
+                        objApplicationDBContext.BillEntries.RemoveRange(objBillToDelete.Entries);
+                        objApplicationDBContext.Bills.Remove(objBillToDelete);
+                        objApplicationDBContext.SaveChanges();
+                    }
+
+                    objUser.Bills.RemoveAt(nIndex);
+                    SessionManager.SetCurrentUser(objUser);
+
+                    objHttpContext.Response.Write(JsonConvert.SerializeObject(new Response() { Success = true }));
+                }
+                else
+                {
+                    objHttpContext.Response.Write(JsonConvert.SerializeObject(new Response() { Success = false }));
                 }
             }
             else if (strAction.Equals("Get"))
@@ -223,7 +268,10 @@ namespace BillsManagementWebApp.Handlers
                 objBill.Shop.UserOwner = null;
                 for (int i = 0; i < objBill.Entries.Count; i++)
                 {
-                    objBill.Entries[i].Category.UserOwner = null;
+                    if (objBill.Entries[i].Category != null)
+                    {
+                        objBill.Entries[i].Category.UserOwner = null;
+                    }
                 }
 
                 objHttpContext.Response.Write(JsonConvert.SerializeObject(new Response()

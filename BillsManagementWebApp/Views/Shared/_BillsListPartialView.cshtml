@@ -110,6 +110,7 @@
         <tr>
             <th style="border-top-left-radius: 4px;">Data zakupów</th>
             <th>Kwota</th>            
+            <th>Sklep</th>            
             <th>Ilość pozycji</th>            
             <th style="border-top-right-radius: 4px;"></th>
         </tr>
@@ -121,6 +122,7 @@
                 <tr id="@("bill-row-" + objBillViewModel.BillID)" role="row">
                     <td>@objBillViewModel.PurchaseDate.ToString("d", new System.Globalization.CultureInfo("pl-PL"))</td>
                     <td>@objBillViewModel.Entries.Sum(x => x.Price).ToString("C", new System.Globalization.CultureInfo("pl-PL"))</td>
+                    <td>@objBillViewModel.Shop.ShopName</td>
                     <td>@objBillViewModel.Entries.Count</td>
                     <td><a class="btn btn-default btn-sm" onclick="GoToEditBill(@objBillViewModel.BillID);"><i class="fa fa-pencil"></i>&nbsp;Edytuj</a></td>
                 </tr>
@@ -131,6 +133,7 @@
         <tr>
             <th style="border-bottom-left-radius: 4px;">Data zakupów</th>
             <th>Kwota</th>
+            <th>Sklep</th>
             <th>Ilość pozycji</th>
             <th style="border-bottom-right-radius: 4px;" data-no-filter="true"></th>
         </tr>

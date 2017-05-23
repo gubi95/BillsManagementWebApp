@@ -122,11 +122,12 @@
             beforeSend: function() {
                 ShowHideAjaxWheel(true);
             },
-            success: function (data) {
+            success: function (data) {                
                 var chartData = [];   
                 for (var i = 0; i < data.length; i++) {
                     chartData.push({
                         name: data[i].CategoryName,
+                        color: data[i].CategoryColor,
                         y: data[i].Price
                     });
                 }                
