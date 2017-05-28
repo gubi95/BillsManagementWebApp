@@ -26,5 +26,10 @@ namespace BillsManagementWebApp.Models
         [Required]
         [ForeignKey("UserOwnerId")]
         public User UserOwner { get; set; }
+
+        [Required]
+        public DateTime LastModifiedDate { get; set; }
+
+        public int ExternalSystemID { get; set; }
     }
 }

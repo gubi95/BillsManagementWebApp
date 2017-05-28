@@ -36,6 +36,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <FilesToIncludeForPublish>AllFilesInTheProject</FilesToIncludeForPublish>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -222,6 +223,10 @@
     <Compile Include="Migrations\201705231818176_Reset.Designer.cs">
       <DependentUpon>201705231818176_Reset.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201705281212028_LastModDate_ExtSysID.cs" />
+    <Compile Include="Migrations\201705281212028_LastModDate_ExtSysID.Designer.cs">
+      <DependentUpon>201705281212028_LastModDate_ExtSysID.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Shop.cs" />
     <Compile Include="Shared\LoggedInUserAttribute.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -250,6 +255,7 @@
     <Compile Include="WebAPI\BillEntryController.cs" />
     <Compile Include="WebAPI\ProductCategoryController.cs" />
     <Compile Include="WebAPI\ShopController.cs" />
+    <Compile Include="WebAPI\SyncController.cs" />
     <Compile Include="WebAPI\UserController.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -1667,6 +1673,7 @@
     <Content Include="Views\Shared\_BillsListPartialView.cshtml" />
     <Content Include="Views\Shared\_BillsChartsPartialView.cshtml" />
     <Content Include="Views\Shared\_ProductCategoriesPartialView.cshtml" />
+    <None Include="Properties\PublishProfiles\MyPub.pubxml" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Assets\js\moment-develop\moment.d.ts" />
@@ -1678,6 +1685,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201705231818176_Reset.resx">
       <DependentUpon>201705231818176_Reset.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201705281212028_LastModDate_ExtSysID.resx">
+      <DependentUpon>201705281212028_LastModDate_ExtSysID.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

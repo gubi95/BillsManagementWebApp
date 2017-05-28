@@ -52,9 +52,10 @@ namespace BillsManagementWebApp.WebAPI
         public class BillEntryApiWrapper
         {
             // additional
-            public int BillID { get; set; }
-
+            public int BillID { get; set; }         
             public int BillEntryID { get; set; }
+            public int ExternalSystemID { get; set; }
+            public DateTime LastModifiedDate { get; set; }
             public string ProductName { get; set; }
             public decimal Price { get; set; }
             public double Quantity { get; set; }
@@ -63,6 +64,8 @@ namespace BillsManagementWebApp.WebAPI
             public BillEntryApiWrapper() { }
             public BillEntryApiWrapper(BillEntry objBillEntry)
             {
+                this.LastModifiedDate = objBillEntry.LastModifiedDate;
+                this.ExternalSystemID = objBillEntry.ExternalSystemID;
                 this.BillEntryID = objBillEntry.BillEntryID;
                 this.ProductName = objBillEntry.ProductName;
                 this.Price = objBillEntry.Price;

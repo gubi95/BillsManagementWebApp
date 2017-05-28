@@ -50,6 +50,8 @@ namespace BillsManagementWebApp.WebAPI
         public class ShopApiWrapper
         {
             public int ShopID { get; set; }
+            public int ExternalSystemID { get; set; }
+            public DateTime LastModifiedDate { get; set; }
             public string ShopName { get; set; }
             public int UserOwnerID { get; set; }
 
@@ -59,6 +61,8 @@ namespace BillsManagementWebApp.WebAPI
                 this.ShopID = objShop.ShopID;
                 this.ShopName = objShop.ShopName;
                 this.UserOwnerID = objShop.UserOwner.UserID;
+                this.ExternalSystemID = objShop.ExternalSystemID;
+                this.LastModifiedDate = objShop.LastModifiedDate;
             }
 
             public void FillModel(ref Shop objShop)

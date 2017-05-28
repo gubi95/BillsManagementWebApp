@@ -20,6 +20,7 @@ namespace BillsManagementWebApp.Handlers
             public DateTime From { get; set; }
             public DateTime To { get; set; }
             public string ChartType { get; set; }
+            public bool IsBarChartWithMonthBudget { get; set; }
         }
 
         private class CategoryPieChartSeries
@@ -27,12 +28,14 @@ namespace BillsManagementWebApp.Handlers
             public string CategoryName { get; set; }
             public string CategoryColor { get; set; }
             public decimal Price { get; set; }
+            public decimal MonthBudget { get; set; } 
 
             public CategoryPieChartSeries(ProductCategoryToTotalPrice objProductCategoryToTotalPrice)
             {
                 this.CategoryName = objProductCategoryToTotalPrice.Category.Name;
                 this.CategoryColor = objProductCategoryToTotalPrice.Category.Color;
                 this.Price = objProductCategoryToTotalPrice.Price;
+                this.MonthBudget = objProductCategoryToTotalPrice.Category.MonthBudget;
             }
         }
 
@@ -50,7 +53,7 @@ namespace BillsManagementWebApp.Handlers
 
             if (objPostedData != null)
             {
-                if (objPostedData.ChartType == "CategoryPieChart")
+                if (objPostedData.ChartType == "CategoryBarChart")
                 { 
                     Models.User objUser = SessionManager.GetCurrentUser();
 
@@ -72,7 +75,8 @@ namespace BillsManagementWebApp.Handlers
                     {
                         foreach (BillEntry objBillEntry in objBill.Entries)
                         {
-                            int nIndex = listProductCategoryToTotalPrice.FindIndex(x => x.Category.ProductCategoryID == objBillEntry.Category.ProductCategoryID);
+                            int nCategoryIdToCompare = objBillEntry.Category != null ? objBillEntry.Category.ProductCategoryID : -1;
+                            int nIndex = listProductCategoryToTotalPrice.FindIndex(x => x.Category.ProductCategoryID == nCategoryIdToCompare);
 
                             if (nIndex >= 0)
                             {
@@ -96,7 +100,7 @@ namespace BillsManagementWebApp.Handlers
                     objHttpContext.Response.Write(JsonConvert.SerializeObject(listCategoryPieChartSeries));
                     objHttpContext.Response.Flush();
                     objHttpContext.Response.End();
-                }
+                }                
             }        
         }
 

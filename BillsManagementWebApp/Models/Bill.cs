@@ -18,7 +18,12 @@ namespace BillsManagementWebApp.Models
 
         public List<BillEntry> Entries { get; set; }
 
-        [Required]
+        [Required]                    
         public Shop Shop { get; set; }
+
+        [Required]
+        public DateTime LastModifiedDate { get; set; }
+
+        public int ExternalSystemID { get; set; }
     }
 }

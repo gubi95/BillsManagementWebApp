@@ -80,14 +80,16 @@ namespace BillsManagementWebApp.Handlers
                             Category = listProductCategory.Find(x => x.ProductCategoryID == objViewProduct.ProductCategoryID),
                             Price = objViewProduct.Price,
                             ProductName = objViewProduct.ProductName,
-                            Quantity = objViewProduct.Quantity
+                            Quantity = objViewProduct.Quantity,
+                            LastModifiedDate = DateTime.Now
                         });
                     }
 
                     Bill objBill = new Bill()
                     {
                         PurchaseDate = objViewBill.PurchaseDate,
-                        Entries = listBillEntry
+                        Entries = listBillEntry,
+                        LastModifiedDate = DateTime.Now
                     };
 
                     AssignShopToBill(objApplicationDBContext, ref objBill, objViewBill, nCurrentUserID);
@@ -155,6 +157,7 @@ namespace BillsManagementWebApp.Handlers
                                                                     .ToList();
 
                         objBill.PurchaseDate = objViewBill.PurchaseDate;
+                        objBill.LastModifiedDate = DateTime.Now;
                         AssignShopToBill(objApplicationDBContext, ref objBill, objViewBill, nCurrentUserID);
 
                         // remove deleted entries
@@ -172,6 +175,7 @@ namespace BillsManagementWebApp.Handlers
                                     ProductName = objViewBill.Products[i].ProductName,
                                     Quantity = objViewBill.Products[i].Quantity,
                                     Price = objViewBill.Products[i].Price,
+                                    LastModifiedDate = DateTime.Now
                                 });
                             }
                             else
@@ -180,6 +184,7 @@ namespace BillsManagementWebApp.Handlers
                                 objBillEntryToUpdate.ProductName = objViewBill.Products[i].ProductName;
                                 objBillEntryToUpdate.Quantity = objViewBill.Products[i].Quantity;
                                 objBillEntryToUpdate.Price = objViewBill.Products[i].Price;
+                                objBillEntryToUpdate.LastModifiedDate = DateTime.Now;
                             }
                         }
 
@@ -297,7 +302,8 @@ namespace BillsManagementWebApp.Handlers
                 objShop = new Shop()
                 {
                     ShopName = objViewBill.Store.StoreName,
-                    UserOwner = objApplicationDBContext.Users.Where(x => x.UserID == nCurrentUserID).FirstOrDefault()
+                    UserOwner = objApplicationDBContext.Users.Where(x => x.UserID == nCurrentUserID).FirstOrDefault(),
+                    LastModifiedDate = DateTime.Now
                 };
 
                 objApplicationDBContext.Shops.Add(objShop);

@@ -58,7 +58,9 @@ namespace BillsManagementWebApp.WebAPI
         {            
             public int UserID { get; set; }
             public int BillID { get; set; }
+            public int ExternalSystemID { get; set; }
             public DateTime PurchaseDate { get; set; }             
+            public DateTime LastModifiedDate { get; set; }
             public ShopController.ShopApiWrapper Shop { get; set; }
             public List<BillEntryController.BillEntryApiWrapper> Entries { get; set; }            
 
@@ -69,6 +71,8 @@ namespace BillsManagementWebApp.WebAPI
                 this.PurchaseDate = objBill.PurchaseDate;
                 this.Entries = new List<BillEntryController.BillEntryApiWrapper>();
                 this.Shop = new ShopController.ShopApiWrapper(objBill.Shop);
+                this.LastModifiedDate = objBill.LastModifiedDate;
+                this.ExternalSystemID = objBill.ExternalSystemID;
 
                 foreach (BillEntry objBillEntry in objBill.Entries)
                 {

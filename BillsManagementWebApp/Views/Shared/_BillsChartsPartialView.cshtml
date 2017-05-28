@@ -24,7 +24,7 @@
             jQuery('#dtBillsRangeTo').data('DateTimePicker').minDate(e.date);
 
             if (allowToChangePeriodDropdown) {
-                CreateCategoryPieChart();
+                CreateCategoryBarChart();
                 jQuery('#ddlChartsPeriod').selectpicker('val', 'NONE');
             }
             allowToChangePeriodDropdown = true;            
@@ -34,7 +34,7 @@
             jQuery('#dtBillsRangeFrom').data('DateTimePicker').maxDate(e.date);
 
             if (allowToChangePeriodDropdown) {
-                CreateCategoryPieChart();
+                CreateCategoryBarChart();
                 jQuery('#ddlChartsPeriod').selectpicker('val', 'NONE');
             }
             allowToChangePeriodDropdown = true;
@@ -45,23 +45,23 @@
         switch (ddlValue) {
             case 'CM':
                 SetBillsDateRange_currentMonth();
-                CreateCategoryPieChart();
+                CreateCategoryBarChart();
                 break;
             case 'LM':
                 SetBillsDateRange_lastMonth();
-                CreateCategoryPieChart();
+                CreateCategoryBarChart();
                 break;
             case 'L30D':
                 SetBillsDateRange_last30Days();
-                CreateCategoryPieChart();
+                CreateCategoryBarChart();
                 break;
             case 'CY':
                 SetBillsDateRange_currentYear();
-                CreateCategoryPieChart();
+                CreateCategoryBarChart();
                 break;
             case 'LY':
                 SetBillsDateRange_lastYear();
-                CreateCategoryPieChart();
+                CreateCategoryBarChart();
                 break;
         }
     }
@@ -109,7 +109,7 @@
         jQuery('#dtBillsRangeTo').data('DateTimePicker').date(dtEnd);
     }
 
-    function CreateCategoryPieChart() {
+    function CreateCategoryBarChart() {
         jQuery.ajax({
             type: 'POST',
             url: '/Handlers/ChartsDataHandler.ashx',
@@ -117,21 +117,116 @@
             data: JSON.stringify({
                 From: FormatJSDateToCSharpDate(jQuery('#dtBillsRangeFrom').data('DateTimePicker').date()._d),
                 To: FormatJSDateToCSharpDate(jQuery('#dtBillsRangeTo').data('DateTimePicker').date()._d),
-                ChartType: 'CategoryPieChart'
+                ChartType: 'CategoryBarChart'
             }),
             beforeSend: function() {
                 ShowHideAjaxWheel(true);
             },
             success: function (data) {                
-                var chartData = [];   
+                var chartData = [];
+                var chartCategories = [];
                 for (var i = 0; i < data.length; i++) {
                     chartData.push({
                         name: data[i].CategoryName,
                         color: data[i].CategoryColor,
-                        y: data[i].Price
+                        data: [data[i].Price]
                     });
-                }                
-                DrawCategoryPieChart(chartData);
+
+                    chartCategories.push(name);
+                }
+
+                chartData.sort(function (a, b) {
+                    return b.data[0] - a.data[0];
+                });
+
+                DrawCategoryBarChart(chartData, chartCategories);
+                ShowHideAjaxWheel(false);
+            },
+            error: function () {
+                ShowHideAjaxWheel(false);
+            }
+        });
+    }
+
+    var arrCurrentChartBudgets = [];
+    var arrCurrentChartBudgetsCategoryValues = [];
+    var categoryBudgetChartTotalPrice = null;
+    function CreateCategoryBudgetBarChart() {
+        jQuery.ajax({
+            type: 'POST',
+            url: '/Handlers/ChartsDataHandler.ashx',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                From: FormatJSDateToCSharpDate(jQuery('#dtBillsRangeFrom').data('DateTimePicker').date()._d),
+                To: FormatJSDateToCSharpDate(jQuery('#dtBillsRangeTo').data('DateTimePicker').date()._d),
+                ChartType: 'CategoryBarChart'
+            }),
+            beforeSend: function () {
+                ShowHideAjaxWheel(true);
+            },
+            success: function (data) {                
+                var chartData = [];
+                var chartCategories = [];
+                for (var i = 0; i < data.length; i++) {
+                    chartData.push({
+                        name: data[i].CategoryName,
+                        color: data[i].CategoryColor,
+                        data: [data[i].Price],
+                        budget: data[i].MonthBudget,
+                        type: 'column',
+                        yAxis: 0
+                    });
+
+                    chartCategories.push(name);
+                }
+
+                chartData.sort(function (a, b) {
+                    return b.data[0] - a.data[0];
+                });
+
+                var lineChartData = [];
+
+                arrCurrentChartBudgetsCategoryValues = [];
+
+                for (var j = 0; j < chartData.length; j++) {                    
+                    var value = chartData[j].data[0];                    
+                    chartData[j].data = new Array();
+
+                    for (var k = 0; k < chartData.length; k++) {
+                        if (j == k) {
+                            arrCurrentChartBudgetsCategoryValues.push(value);
+                            chartData[j].data.push(value);
+                        }
+                        else {                            
+                            chartData[j].data.push(0);                            
+                        }
+                    }
+
+                    lineChartData.push(chartData[j].budget != 0.00 ? chartData[j].budget : null);
+                }
+
+                arrCurrentChartBudgets = lineChartData;
+
+                chartData.push({
+                    name: 'Budżet',
+                    type: 'line',
+                    lineWidth: 0,
+                    color: '#FF0000',
+                    lineColor: 'rgba(0,0,0,0)',
+                    data: lineChartData,
+                    tooltip: {
+                        shared: false,
+                        pointFormatter: function () {
+                            var index = this.index;
+                            var balance = (arrCurrentChartBudgets[index] - arrCurrentChartBudgetsCategoryValues[index]).toFixed(2);
+                            var balanceString = (balance > 0 ? '+' + balance : balance);
+                            return  'Ustalony budżet: <b>' + arrCurrentChartBudgets[index].toFixed(2) + ' zł</b><br/>' +
+                            'Bilans: <b style="color: ' + (balance == 0.00 ? 'black' : (balance < 0.00 ? 'red' : 'green')) + ';">' + balanceString + ' zł</b>';
+                        }
+                    },
+                });
+
+                DrawCategoryBudgetBarChart(chartData, chartCategories);
                 ShowHideAjaxWheel(false);
             },
             error: function () {
@@ -141,19 +236,20 @@
     }
 
     var categoryPieChartTotalPrice = null;
-    function DrawCategoryPieChart(data) {            
+
+    function DrawCategoryBarChart(data, categories) {
         categoryPieChartTotalPrice = 0;              
         for (var i = 0; i < data.length; i++) {
-            categoryPieChartTotalPrice += data[i].y;
+            categoryPieChartTotalPrice += data[i].data[0];
         }
 
-        Highcharts.chart('categoryPieChartCanvas', {
+        Highcharts.chart('categoryBarChartCanvas', {
             chart: {
                 backgroundColor: 'rgba(255,255,255,0.25)',
                 plotBackgroundColor: null,
                 plotBorderWidth: null,
                 plotShadow: false,
-                type: 'pie',
+                type: 'column',
                 events: {
                     load: function () {
                         jQuery('#categoryPieChartCanvas .highcharts-text-outline').attr('stroke-width', 0);
@@ -175,33 +271,94 @@
                     fontSize: '32px'
                 }
             },
-            tooltip: {
-                pointFormat: '{point.y} zł / ' + categoryPieChartTotalPrice + ' zł <br/> <b>{point.percentage:.2f}%</b>'
+            xAxis: {
+                categories: categories,
+                crosshair: true
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Kwota [zł]',                    
+                },
+                color: '#FFFFFF'
+            },
+            tooltip: {                
+                pointFormatter: function () { return this.y + ' zł / ' + categoryPieChartTotalPrice + ' zł <br/> <b>' + ((this.y / categoryPieChartTotalPrice) * 100).toFixed(2).toString() + '%</b>'; }
             },
             plotOptions: {
-                pie: {
-                    allowPointSelect: true,
-                    cursor: 'pointer',
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0,
                     dataLabels: {
                         enabled: true,
-                        format: '{point.name}: {point.percentage:.2f} %',
-                        style: {
-                            color: 'white',
-                            fontFamily: '\'Lato\', sans-serif',
-                            lineHeight: '18px',
-                            fontSize: '17px'
-                        }
+                        formatter: function () { return this.y.toFixed(2).toString() + ' zł'; },
+                        color: '#FFFFFF'
                     }
                 }
             },
-            series: [{
-                name: null,
-                colorByPoint: true,
-                data: data
-            }]
+            series: data
         });
     }
 
+    function DrawCategoryBudgetBarChart(data, categories) {
+        categoryBudgetChartTotalPrice = 0;
+        for (var i = 0; i < data.length; i++) {
+            if (data[i].data[i] != undefined) {
+                categoryBudgetChartTotalPrice += data[i].data[i];
+            }
+        }
+
+        Highcharts.chart('categoryBarChartBudgetCanvas', {
+            chart: {
+                backgroundColor: 'rgba(255,255,255,0.25)',
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+            },
+            credits: {
+                enabled: false
+            },
+            title: {
+                text: 'Miesięczny budżet',
+                style: {
+                    color: 'white',
+                    fontFamily: '\'Lato\', sans-serif',
+                    lineHeight: '28px',
+                    fontSize: '32px'
+                }
+            },           
+            xAxis: [{
+                categories: categories,
+                crosshair: true
+            }],
+            yAxis: [
+                { 
+                    min: 0,
+                    title: {
+                        text: 'Budżet [zł]',
+                    },                    
+                },
+                { 
+                    title: {
+                        text: '',                        
+                    },
+                min: 0,               
+                opposite: true
+            }],
+            tooltip: {
+                shared: false,
+                pointFormatter: function () { return this.y.toFixed(2) + ' zł / ' + categoryBudgetChartTotalPrice.toFixed(2) + ' zł <br/> <b>' + ((this.y / categoryBudgetChartTotalPrice) * 100).toFixed(2).toString() + '%</b>'; }
+            },
+            plotOptions: {
+                column: {
+                    stacking: 'normal',
+                    pointPadding: 0.2,
+                    borderWidth: 0,                    
+                }
+            },
+            series: data
+        });
+    }
 </script>
 
 
@@ -238,4 +395,5 @@
     </div>
 </div>
 
-<div id="categoryPieChartCanvas" style="width: 100%; height: 400px; margin: 0 auto"></div>
+<div id="categoryBarChartCanvas" style="width: 100%; height: 400px; margin: 0 auto;"></div>
+<div id="categoryBarChartBudgetCanvas" style="width: 100%; height: 400px; margin: 0 auto; margin-top: 30px;"></div>

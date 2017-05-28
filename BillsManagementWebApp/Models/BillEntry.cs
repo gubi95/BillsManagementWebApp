@@ -22,5 +22,10 @@ namespace BillsManagementWebApp.Models
         public double Quantity { get; set; }
                         
         public ProductCategory Category { get; set; }
+
+        [Required]
+        public DateTime LastModifiedDate { get; set; }
+
+        public int ExternalSystemID { get; set; }
     }
 }

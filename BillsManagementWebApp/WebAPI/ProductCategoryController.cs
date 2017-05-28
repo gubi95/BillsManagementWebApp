@@ -52,6 +52,8 @@ namespace BillsManagementWebApp.WebAPI
             public string Name { get; set; }
             public string Color { get; set; }
             public decimal MonthBudget { get; set; }
+            public int ExternalSystemID { get; set; }
+            public DateTime LastModifiedDate { get; set; }
 
             public ProductCategoryApiWrapper() { }
             public ProductCategoryApiWrapper(ProductCategory objProductCategory)
@@ -60,6 +62,8 @@ namespace BillsManagementWebApp.WebAPI
                 this.Name = objProductCategory.Name;
                 this.Color = objProductCategory.Color;
                 this.MonthBudget = objProductCategory.MonthBudget;
+                this.ExternalSystemID = objProductCategory.ExternalSystemID;
+                this.LastModifiedDate = objProductCategory.LastModifiedDate;
             }
 
             public void FillModel(ref ProductCategory objProductCategory)
@@ -129,6 +133,7 @@ namespace BillsManagementWebApp.WebAPI
             for (int i = 0; i < listBillEntriesToNullifyCategory.Count; i++)
             {
                 listBillEntriesToNullifyCategory[i].Category = null;
+                listBillEntriesToNullifyCategory[i].LastModifiedDate = DateTime.Now;
             }
             objApplicationDBContext.SaveChanges();
 
@@ -162,11 +167,13 @@ namespace BillsManagementWebApp.WebAPI
                     objProductCategoryNew.ProductCategoryID = 0;
                     objProductCategoryNew.UserOwner = objUser;
                     objProductCategoryNew.UserOwnerId = objUser.UserID;
-                    listProductCategoryNew.Add(objProductCategoryNew);                    
+                    objProductCategoryNew.LastModifiedDate = DateTime.Now;
+                    listProductCategoryNew.Add(objProductCategoryNew);                                        
                 }
                 else
                 {
                     objProductCategoryApiWrapper.FillModel(ref objProductCategory);
+                    objProductCategory.LastModifiedDate = DateTime.Now;
                 }
             }
 
