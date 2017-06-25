@@ -50,8 +50,7 @@ namespace BillsManagementWebApp.WebAPI
         [ActionName("getall")]
         public SyncReturnEntityWrapper GetAll(int UserID)
         {
-            ApplicationDBContext objApplicationDBContext = new ApplicationDBContext();
-
+            ApplicationDBContext objApplicationDBContext = new ApplicationDBContext();      
             Models.User objUser = objApplicationDBContext
                                     .Users
                                     .Include("Bills")
